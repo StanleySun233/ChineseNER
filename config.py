@@ -27,4 +27,4 @@ RUN_CONFIG = {
     'intra_op_parallel': 2
 }
 
-PATH = 'D:\\data\\ChineseNER'
+PATH = 'D:/data/ChineseNER'
