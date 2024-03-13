@@ -6,6 +6,7 @@ import jieba
 import importlib
 from tqdm import tqdm
 
+
 class AugHandler(object):
     def __init__(self, max_sample, change_rate):
         self.max_sample = max_sample
@@ -19,8 +20,8 @@ class AugHandler(object):
         new_l = list()
         for i in range(self.max_sample):
             s, l = self.gen_single_sample(sentence, label)
-            if s!=sentence:
-                assert len(s.split(' ')) == len(l.split(' ')), '{}!={}'.format(s,l)
+            if s != sentence:
+                assert len(s.split(' ')) == len(l.split(' ')), '{}!={}'.format(s, l)
                 new_s.append(s)
                 new_l.append(l)
                 if verbose:
@@ -34,9 +35,9 @@ class AugHandler(object):
         pre_tag = ''
         s_chunk = []
         l_chunk = []
-        for pos, (s,l) in enumerate(zip(sentence.split(' '), label.split(' '))):
+        for pos, (s, l) in enumerate(zip(sentence.split(' '), label.split(' '))):
             # get NER type
-            if l!='O':
+            if l != 'O':
                 tag = l.split('-')[1]
             else:
                 tag = 'O'
@@ -46,14 +47,14 @@ class AugHandler(object):
                 s_chunk = [s]
                 l_chunk = [l]
 
-            elif pre_tag == tag and l.split('-')[0]!='B':
+            elif pre_tag == tag and l.split('-')[0] != 'B':
                 s_chunk.append(s)
                 l_chunk.append(l)
             else:
                 yield pre_tag, ' '.join(s_chunk), ' '.join(l_chunk)
                 pre_tag = tag
-                s_chunk=[s]
-                l_chunk=[l]
+                s_chunk = [s]
+                l_chunk = [l]
         if s_chunk:
             yield pre_tag, ' '.join(s_chunk), ' '.join(l_chunk)
 
@@ -72,17 +73,17 @@ class AugHandler(object):
 
     @staticmethod
     def chunk_by_sentence(sentence, label):
-       sep = {'，'}# 暂时只考虑逗号，其他分隔符对语义影响更大
-       s_chunk = []
-       l_chunk = []
-       for s,l in zip(sentence.split(' '), label.split(' ')):
-           s_chunk.append(s)
-           l_chunk.append(l)
-           if s in sep:
-               yield  ' '.join(s_chunk), ' '.join(l_chunk)
-               s_chunk = []
-               l_chunk = []
-       yield ' '.join(s_chunk), ' '.join(l_chunk)
+        sep = {'，'}  # 暂时只考虑逗号，其他分隔符对语义影响更大
+        s_chunk = []
+        l_chunk = []
+        for s, l in zip(sentence.split(' '), label.split(' ')):
+            s_chunk.append(s)
+            l_chunk.append(l)
+            if s in sep:
+                yield ' '.join(s_chunk), ' '.join(l_chunk)
+                s_chunk = []
+                l_chunk = []
+        yield ' '.join(s_chunk), ' '.join(l_chunk)
 
 
 class EntityReplace(AugHandler):
@@ -96,14 +97,14 @@ class EntityReplace(AugHandler):
         with open(self.ner_dict_file, 'rb') as f:
             ner_dict = pickle.load(f)
         print('Loading NER DICT {}PER {}LOC {}ORG'.format(
-            len(ner_dict['PER']), len(ner_dict['LOC']),len(ner_dict['ORG'])
+            len(ner_dict['PER']), len(ner_dict['LOC']), len(ner_dict['ORG'])
         ))
         return ner_dict
 
     def select_ner(self, tag, word, label):
         if random.random() < self.change_rate:
             ner = random.choice(self.ner_dict[tag])
-            label = ['B-'+tag] + ['I-'+tag] *(len(ner)-1)
+            label = ['B-' + tag] + ['I-' + tag] * (len(ner) - 1)
             return ' '.join(ner), ' '.join(label)
         else:
             return word, label
@@ -117,7 +118,7 @@ class EntityReplace(AugHandler):
         """
         s = []
         l = []
-        for tag, s_chunk, l_chunk  in self.chunk_by_tag(sentence, label):
+        for tag, s_chunk, l_chunk in self.chunk_by_tag(sentence, label):
             if tag in self.ner_dict:
                 new_s, new_l = self.select_ner(tag, s_chunk, l_chunk)
                 s.append(new_s)
@@ -135,10 +136,11 @@ class SynomReplace(AugHandler):
     对非实体的部分进行随机同义词替换, 这里使用gensim word2vec进行替换
     replace_rate: 控制每个词被替换的概率，再复杂一些可以更高概率替换实体周边词，以及替换概率和句子长度相关
     """
+
     def __init__(self, model_dir, max_sample, change_rate):
         super(SynomReplace, self).__init__(max_sample, change_rate)
         self.model_dir = model_dir
-        self.model= getattr(importlib.import_module(self.model_dir), 'model')
+        self.model = getattr(importlib.import_module(self.model_dir), 'model')
 
     def select_synom(self, word, label):
         """
@@ -159,7 +161,7 @@ class SynomReplace(AugHandler):
         s = []
         l = []
         for tag, s_chunk, l_chunk in self.chunk_by_word(sentence, label):
-            if tag =='O':
+            if tag == 'O':
                 new_s, new_l = self.select_synom(s_chunk, l_chunk)
                 s.append(new_s)
                 l.append(new_l)
@@ -180,7 +182,7 @@ class SentenceShuffle(AugHandler):
         l = []
         pre_s = None
         pre_l = None
-        for cur_s, cur_l in self.chunk_by_sentence(sentence, label ):
+        for cur_s, cur_l in self.chunk_by_sentence(sentence, label):
             if not pre_s:
                 pre_s = cur_s
                 pre_l = cur_l
@@ -235,5 +237,5 @@ if __name__ == '__main__':
                                              mlm_handler.gen_sample
                                              ])
 
-    with open('./data/people_daily/train_augment.pkl','rb') as f:
+    with open('./data/people_daily/train_augment.pkl', 'rb') as f:
         data = pickle.load(f)

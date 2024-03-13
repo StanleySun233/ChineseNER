@@ -19,14 +19,14 @@ def build_graph(features, labels, params, is_training):
         embedding = tf.nn.embedding_lookup(params['embedding'], input_ids)
         embedding = tf.layers.dropout(embedding, rate=params['embedding_dropout'],
                                       seed=1234, training=is_training)
-        add_layer_summary(embedding.name, embedding) # emb_dim=50
+        add_layer_summary(embedding.name, embedding)  # emb_dim=50
 
     with tf.variable_scope('word_enhance'):
-        emb_dim = embedding.shape.as_list()[-1] # you can specify other dimension
+        emb_dim = embedding.shape.as_list()[-1]  # you can specify other dimension
         softword_embedding = tf.get_variable(
             shape=[params['word_enhance_dim'], emb_dim],
             initializer=tf.truncated_normal_initializer(), name='softword_embedding')
-        wh_embedding = tf.nn.embedding_lookup(softword_embedding, softword_ids) # max_seq_len * emb_dim
+        wh_embedding = tf.nn.embedding_lookup(softword_embedding, softword_ids)  # max_seq_len * emb_dim
         wh_embedding = tf.layers.dropout(wh_embedding, rate=params['embedding_dropout'],
                                          seed=1234, training=is_training)
         embedding = tf.concat([embedding, wh_embedding], axis=-1)
@@ -37,7 +37,7 @@ def build_graph(features, labels, params, is_training):
                          params['cell_size'], seq_len, params['dtype'], is_training)
 
     lstm_output = tf.layers.dropout(lstm_output, seed=1234, rate=params['embedding_dropout'],
-                                      training=is_training)
+                                    training=is_training)
 
     add_layer_summary(lstm_output.name, lstm_output)
 
@@ -66,5 +66,5 @@ TRAIN_PARAMS.update({
     'lr': 0.005,
     'decay_rate': 0.95,  # lr * decay_rate ^ (global_step / train_steps_per_epoch)
     'embedding_dropout': 0.2,
-    'early_stop_ratio': 2 # stop after no improvement after 1.5 epochs
+    'early_stop_ratio': 2  # stop after no improvement after 1.5 epochs
 })

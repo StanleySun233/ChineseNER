@@ -35,7 +35,8 @@ def build_graph(features, labels, params, is_training):
                                              dtype=params['dtype'],
                                              name='softlexicon_embedding')
         word_embedding_dim = softword_embedding.shape.as_list()[-1]
-        wh_embedding = tf.nn.embedding_lookup(softword_embedding, softlexicon_ids) # max_seq_len * 50(MaxLexicon * len(SoftIdx)) * emb_dim
+        wh_embedding = tf.nn.embedding_lookup(softword_embedding,
+                                              softlexicon_ids)  # max_seq_len * 50(MaxLexicon * len(SoftIdx)) * emb_dim
         wh_embedding = tf.multiply(wh_embedding, tf.expand_dims(softlexicon_weights, axis=-1))
         # Method1: weighted average lexicons in each B/M/E/S and concatenate -> 4 * emb_dim
         wh_embedding = tf.reshape(wh_embedding, [-1, params['max_seq_len'], params['word_enhance_dim'],
@@ -54,7 +55,7 @@ def build_graph(features, labels, params, is_training):
                          params['cell_size'], seq_len, params['dtype'], is_training)
 
     lstm_output = tf.layers.dropout(lstm_output, seed=1234, rate=params['embedding_dropout'],
-                                      training=is_training)
+                                    training=is_training)
 
     logits = tf.layers.dense(lstm_output, units=params['label_size'], activation=None,
                              use_bias=True, name='logits')
@@ -70,16 +71,15 @@ def build_graph(features, labels, params, is_training):
 RNN_PARAMS = {
     'cell_type': 'lstm',
     'cell_size': 1,
-    'hidden_units_list': [200], # 128 for people_daily ,200 for msra
+    'hidden_units_list': [200],  # 128 for people_daily ,200 for msra
     'keep_prob_list': [0.9],
     'rnn_activation': 'tanh',
 }
 
-
 TRAIN_PARAMS.update(RNN_PARAMS)
 TRAIN_PARAMS.update({
-    'lr': 5e-6, # small base learning rate for bert
-    'diff_lr_times': {'crf': 500,  'logit': 500, 'lstm': 100, 'word_enhance': 100},  # different lr per-layer
+    'lr': 5e-6,  # small base learning rate for bert
+    'diff_lr_times': {'crf': 500, 'logit': 500, 'lstm': 100, 'word_enhance': 100},  # different lr per-layer
     'embedding_dropout': 0.5,
-    'early_stop_ratio': 1 # stop after no improvement after 1.5 epochs
+    'early_stop_ratio': 1  # stop after no improvement after 1.5 epochs
 })

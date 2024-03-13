@@ -33,7 +33,7 @@ def get_masked_lm_output(bert_config, input_tensor, output_weights, positions):
                 units=bert_config.hidden_size,
                 activation=modeling.get_activation(bert_config.hidden_act),
                 kernel_initializer=modeling.create_initializer(
-                  bert_config.initializer_range))
+                    bert_config.initializer_range))
             input_tensor = modeling.layer_norm(input_tensor)
 
     output_bias = tf.get_variable(
@@ -79,63 +79,66 @@ def build_model_fn():
         if mode == tf.estimator.ModeKeys.PREDICT:
             spec = tf.estimator.EstimatorSpec(mode, predictions={'prob': probs})
             return spec
+
     return model_fn
 
 
 def build_input_fn(generator):
     def helper():
         dataset = tf.data.Dataset.from_generator(
-             generator,
-             output_shapes={'input_ids':[None],
-                             'segment_ids':[None],
-                             'seq_len':[],
-                             'mask_pos':[None]},
-             output_types={'input_ids': tf.int32,
-                         'segment_ids': tf.int32,
-                         'seq_len': tf.int32,
-                         'mask_pos': tf.int32}).batch(1)
+            generator,
+            output_shapes={'input_ids': [None],
+                           'segment_ids': [None],
+                           'seq_len': [],
+                           'mask_pos': [None]},
+            output_types={'input_ids': tf.int32,
+                          'segment_ids': tf.int32,
+                          'seq_len': tf.int32,
+                          'mask_pos': tf.int32}).batch(1)
         return dataset
+
     return helper
 
 
 estimator = build_estimator({'ckpt_dir': None,
                              'pretrain_dir': './pretrain_model/ch_google',
                              'warm_start': False},
-                             None,
+                            None,
                             build_model_fn(), True,
                             RUN_CONFIG)
+
 
 class MlmSR(AugHandler):
     def __init__(self, max_sample, change_rate):
         super(MlmSR, self).__init__(max_sample, change_rate)
         self.max_seq_len = MAX_SEQ_LEN
         self.tokenizer = get_bert_tokenizer()
-        self.available_pos = [] #可以被mask的位置/会剔除存在实体的位置
+        self.available_pos = []  # 可以被mask的位置/会剔除存在实体的位置
         self.fp = FastPredict(estimator, build_input_fn)
 
     def _mask_token(self, tokens):
         n = len(tokens)
         n_mask = max(int(n * self.change_rate), 1)
-        if len(self.available_pos) < n_mask *2 :
+        if len(self.available_pos) < n_mask * 2:
             raise ValueError('Availble Pos < N_mask*2')
         mask_pos = random.sample(self.available_pos, n_mask)
         for i in mask_pos:
-           tokens[i] = '[MASK]'
+            tokens[i] = '[MASK]'
         return tokens
 
     def gen_available_pos(self, labels):
         """
         过滤所有的实体位置，只对label=O的部分去做MASK，避免改变实体标签
         """
-        labels = labels[:(self.max_seq_len-2)]
+        labels = labels[:(self.max_seq_len - 2)]
         self.available_pos = []
         for i in range(len(labels)):
-            if labels[i]=='O':
+            if labels[i] == 'O':
                 self.available_pos.append(i)
 
     def build_single_feature(self, tokens, labels):
         self.gen_available_pos(labels)
-        tokens = self._mask_token(tokens[: self.max_seq_len-2])
+        tokens = self._mask_token(tokens[: self.max_seq_len - 2])
         tokens = ['[CLS]'] + tokens + ['[SEP]']
         seq_len = len(tokens)
         mask_pos = [i for i, j in enumerate(tokens) if j == '[MASK]']
@@ -161,7 +164,7 @@ class MlmSR(AugHandler):
         labels = label.split()
 
         try:
-            feature = self.build_single_feature(tokens, labels )
+            feature = self.build_single_feature(tokens, labels)
         except ValueError:
             return sentence, label
 
@@ -170,13 +173,13 @@ class MlmSR(AugHandler):
         pred_tokens = self.decode_prediction(pred['prob'])
 
         for i, pos in enumerate(feature['mask_pos']):
-            tokens[pos-1] = pred_tokens[i]
+            tokens[pos - 1] = pred_tokens[i]
 
         return ' '.join(tokens), label
 
 
 if __name__ == '__main__':
-    sentence= '海 钓 比 赛 地 点 在 厦 门 与 金 门 之 间 的 海 域 。'
+    sentence = '海 钓 比 赛 地 点 在 厦 门 与 金 门 之 间 的 海 域 。'
     label = 'O O O O O O O B-LOC I-LOC O B-LOC I-LOC O O O O O O'
 
     mlm = MlmSR(3, 0.1)

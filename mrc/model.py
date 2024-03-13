@@ -4,7 +4,7 @@ from tools.layer import *
 from tools.utils import add_layer_summary
 
 
-def build_graph(features, labels,  params, is_training):
+def build_graph(features, labels, params, is_training):
     """
     pretrain Bert model output + CRF Layer
     """
@@ -13,7 +13,7 @@ def build_graph(features, labels,  params, is_training):
     query_len = features['query_len']
     text_len = features['text_len']
 
-    max_seq_len = tf.reduce_max(query_len+text_len)
+    max_seq_len = tf.reduce_max(query_len + text_len)
     input_mask = tf.sequence_mask(query_len + text_len, maxlen=max_seq_len)
 
     embedding = pretrain_bert_embedding(input_ids, input_mask, segment_ids, params['pretrain_dir'],
@@ -50,7 +50,7 @@ def cross_entropy_loss_mask(logits, label_ids, mask):
         mask = tf.cast(mask, tf.float32)
         loss_mat = tf.nn.sparse_softmax_cross_entropy_with_logits(labels=label_ids, logits=logits)
         loss_mat = tf.multiply(loss_mat, tf.reshape(mask, [-1]))
-        loss = tf.reduce_sum(loss_mat)/tf.reduce_sum(mask + 1e-10) # span mask可能出现为0的情况
+        loss = tf.reduce_sum(loss_mat) / tf.reduce_sum(mask + 1e-10)  # span mask可能出现为0的情况
     return loss
 
 
@@ -62,9 +62,9 @@ def calc_metrics(label_ids, probs, weight, prefix):
     label_ids = tf.one_hot(label_ids, depth=num_labels)
 
     precision, precision_op = tf.metrics.precision(
-            labels=label_ids, predictions=pred_ids, weights=weight)
+        labels=label_ids, predictions=pred_ids, weights=weight)
     recall, recall_op = tf.metrics.recall(
-            labels=label_ids, predictions=pred_ids, weights=weight)
+        labels=label_ids, predictions=pred_ids, weights=weight)
     f1 = 2 * (precision * recall) / (precision + recall)
     metrics = {
 
@@ -72,8 +72,8 @@ def calc_metrics(label_ids, probs, weight, prefix):
                                                        weights=weight,
                                                        summation_method='careful_interpolation'),
         'metric/{}_ap'.format(prefix): tf.metrics.auc(labels=label_ids, predictions=probs, curve='PR',
-                                                     weights=weight,
-                                                     summation_method='careful_interpolation'),
+                                                      weights=weight,
+                                                      summation_method='careful_interpolation'),
         'metric/{}_accuracy'.format(prefix): tf.metrics.accuracy(
             labels=label_ids, predictions=pred_ids, weights=weight),
         'metric/{}_precision'.format(prefix): (precision, precision_op),
@@ -86,7 +86,7 @@ def calc_metrics(label_ids, probs, weight, prefix):
 def build_model_fn():
     def model_fn(features, labels, mode, params):
         is_training = (mode == tf.estimator.ModeKeys.TRAIN)
-        loss, probs, text_mask = build_graph(features, labels, params,  is_training)
+        loss, probs, text_mask = build_graph(features, labels, params, is_training)
 
         if is_training:
             train_op = bert_train_op(loss, params['lr'], params['num_train_steps'],
@@ -107,10 +107,10 @@ def build_model_fn():
 
 
 if __name__ == '__main__':
-    labels = {'start_ids': tf.constant([[0, 1, 0, 0, 0,0], [0,0,1,0,0,0]]),
-              'end_ids': tf.constant([[0, 0, 0, 1, 0,0], [0,0,1,0,0,0]])}
-    start_probs = tf.constant([[1,0,0,0,0,0], [0,0,1,0,0,0]], tf.float32)
-    end_probs = tf.constant([[0,0,0,1,0,0,],[0,0,1,1,0,0]], tf.float32)
-    query_len = tf.constant([1,2])
-    text_len = tf.constant([4,3])
+    labels = {'start_ids': tf.constant([[0, 1, 0, 0, 0, 0], [0, 0, 1, 0, 0, 0]]),
+              'end_ids': tf.constant([[0, 0, 0, 1, 0, 0], [0, 0, 1, 0, 0, 0]])}
+    start_probs = tf.constant([[1, 0, 0, 0, 0, 0], [0, 0, 1, 0, 0, 0]], tf.float32)
+    end_probs = tf.constant([[0, 0, 0, 1, 0, 0, ], [0, 0, 1, 1, 0, 0]], tf.float32)
+    query_len = tf.constant([1, 2])
+    text_len = tf.constant([4, 3])
     max_seq_len = 6

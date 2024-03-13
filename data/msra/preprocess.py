@@ -1,5 +1,7 @@
 # -*-coding:utf-8 -*-
 import os
+
+import config
 from data.base_preprocess import get_instance, read_text
 from data.word_enhance import WordEnhanceMethod
 from data.tokenizer import Tokenizers
@@ -20,8 +22,8 @@ TAG2IDX = {
 MAX_SEQ_LEN = 150
 
 MAPPING = {'train': 'train',
-            'val': 'valid',
-            'test': 'predict'
+           'val': 'valid',
+           'test': 'predict'
            }
 
 
@@ -36,14 +38,13 @@ def load_data(data_dir, file_name):
 
 
 if __name__ == '__main__':
-    data_dir = './data/msra'
+    data_dir = config.PATH + "/data/msra"
 
     for tokenizer in Tokenizers:
-         for word_enhance in [None]+WordEnhanceMethod:
+        for word_enhance in [None] + WordEnhanceMethod:
             for file in MAPPING:
-                print('Dumping TF Record for {} word_enhance = {} tokenizer = {}'.\
+                print('Dumping TF Record for {} word_enhance = {} tokenizer = {}'. \
                       format(file, word_enhance, tokenizer))
                 prep = get_instance(tokenizer, MAX_SEQ_LEN, TAG2IDX, MAPPING, word_enhance)
                 prep.init_data(data_dir, file, load_data)
                 prep.dump_tfrecord()
-

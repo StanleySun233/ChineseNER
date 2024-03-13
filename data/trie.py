@@ -50,10 +50,11 @@ class Trie(object):
         else:
             return {'lexicon': word, 'id': match.id, 'freq': match.frequence}
 
+
 if __name__ == '__main__':
     tree = Trie()
-    tree.insert('今天',1, 100)
-    tree.insert('明天',2, 50)
+    tree.insert('今天', 1, 100)
+    tree.insert('明天', 2, 50)
     tree.search_lexicon('今天')
     tree.search_lexicon('今')
     tree.search_lexicon('明')

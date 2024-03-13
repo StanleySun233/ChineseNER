@@ -12,7 +12,7 @@ def cross_entropy_loss(logits, label_ids, seq_len, label_size, max_seq_len, dtyp
         # calc cross-entropy loss
         loss_mat = tf.nn.sparse_softmax_cross_entropy_with_logits(labels=label_ids, logits=logits)
         loss_mat = tf.multiply(loss_mat, tf.reshape(mask, [-1]))
-        loss = tf.reduce_sum(loss_mat)/tf.reduce_sum(mask)
+        loss = tf.reduce_sum(loss_mat) / tf.reduce_sum(mask)
     return loss
 
 
@@ -36,11 +36,11 @@ def dice_loss(logits, label_ids, seq_len, idx2tag, max_seq_len, alpha, gamma):
 
     with tf.variable_scope('dsc_layer'):
         mask = tf.sequence_mask(seq_len, maxlen=max_seq_len, dtype=tf.float32)
-        probs = tf.nn.softmax(logits, axis=-1) # normalize logits to probs
+        probs = tf.nn.softmax(logits, axis=-1)  # normalize logits to probs
         loss = 0
-        for i,j in idx2tag.items():
-            if j not in ['[PAD]', '[CLS]', '[SEP]','O']:
+        for i, j in idx2tag.items():
+            if j not in ['[PAD]', '[CLS]', '[SEP]', 'O']:
                 input_prob = tf.gather(probs, tf.cast(i, tf.int32), axis=-1)  # batch * max_seq
-                input_label = tf.cast(tf.equal(label_ids, i), tf.float32) # batch * max_seq
+                input_label = tf.cast(tf.equal(label_ids, i), tf.float32)  # batch * max_seq
                 loss += calc_dsc(input_prob, input_label, mask, alpha, gamma)
     return loss

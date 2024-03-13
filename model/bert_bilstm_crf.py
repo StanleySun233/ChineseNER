@@ -44,5 +44,5 @@ RNN_PARAMS = {
 
 TRAIN_PARAMS.update(RNN_PARAMS)
 TRAIN_PARAMS.update({
-    'diff_lr_times': {'crf': 500,  'logit': 500, 'lstm': 100}
+    'diff_lr_times': {'crf': 500, 'logit': 500, 'lstm': 100}
 })

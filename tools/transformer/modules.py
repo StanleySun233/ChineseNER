@@ -10,7 +10,7 @@ from tools.utils import add_layer_summary
 
 def embedding_project(embedding, d_model):
     # emb_size is the raw pretrain char / bichar embedding size
-    emb_size = embedding.shape.as_list()[-1] # emb_size
+    emb_size = embedding.shape.as_list()[-1]  # emb_size
     if emb_size == d_model:
         return embedding
     else:
@@ -45,12 +45,12 @@ def layer_norm(x):
         d_model = x.shape.as_list()[-1]
         epsilon = tf.constant(np.finfo(np.float32).eps)
         mean, variance = tf.nn.moments(x, axes=-1, keep_dims=True)
-        x = (x - mean)/((variance + epsilon)**0.5) # do layer norm
+        x = (x - mean) / ((variance + epsilon) ** 0.5)  # do layer norm
         add_layer_summary('norm', x)
 
         kernel = tf.get_variable('norm_kernel', shape=(d_model,), initializer=tf.ones_initializer())
         bias = tf.get_variable('norm_bias', shape=(d_model,), initializer=tf.zeros_initializer())
-        x= tf.multiply(kernel, x) + bias
+        x = tf.multiply(kernel, x) + bias
         add_layer_summary('norm_transform', x)
     return x
 
@@ -89,7 +89,7 @@ def future_mask_gen(seq_len, max_seq_len):
         mask:  batch_size * input_len * input_len, with 1 to keep, 0 to drop
     """
     # give 0 to all padding position for both key and query
-    seq_mask = seq_mask_gen(seq_len, max_seq_len) # batch_size * 1 * key_len
+    seq_mask = seq_mask_gen(seq_len, max_seq_len)  # batch_size * 1 * key_len
     # batch_size * key_len * key_len(seq_len)
     mask = tf.matmul(seq_mask, seq_mask, transpose_a=True)
     # keep lower triangle with diagonal
@@ -109,8 +109,8 @@ def scaled_dot_product_attention(key, query):
     """
     with tf.variable_scope('scaled_dot_product_attention', reuse=tf.AUTO_REUSE):
         # scalaed weight matrix : batch_size * query_len * key_len
-        dk = tf.cast(key.shape.as_list()[-1], tf.float32)# emb_size
-        weight = tf.matmul(query, key, transpose_b=True)/(dk**0.5)
+        dk = tf.cast(key.shape.as_list()[-1], tf.float32)  # emb_size
+        weight = tf.matmul(query, key, transpose_b=True) / (dk ** 0.5)
         add_layer_summary('att_premask', weight)
     return weight
 
@@ -143,9 +143,10 @@ def multi_head_attention(key, value, query, mask, num_head, dropout_rate, is_tra
         weighted_val: batch_size * query_len * emb_size
     """
     with tf.variable_scope('multi_head_attention', reuse=tf.AUTO_REUSE):
-        d_model = value.shape.as_list()[-1] # emb_size
+        d_model = value.shape.as_list()[-1]  # emb_size
         # linear projection with dimension unchaangned
-        new_key = tf.layers.dense(key, units=d_model, activation=None, name='pre_key_project') # batch_size * key_len * emb_size
+        new_key = tf.layers.dense(key, units=d_model, activation=None,
+                                  name='pre_key_project')  # batch_size * key_len * emb_size
         new_value = tf.layers.dense(value, units=d_model, activation=None, name='pre_value_project')
         new_query = tf.layers.dense(query, units=d_model, activation=None, name='pre_query_project')
 
@@ -184,13 +185,14 @@ def sinusoidal_positional_encoding(emb_dim, pos_seq):
         encoding: 2*max_seq_len * emb_size[-max_seq_len, ...-1,0, 1,...max_seq_len-1]
     """
     with tf.variable_scope('positional_encoding'):
-        inv_freq = np.array([1/(10000 ** ((i - i % 2) /emb_dim)) for i in range(emb_dim)])
-        encoding_matrix = np.einsum('i,j->ij', pos_seq, inv_freq) # max_seq * emb_dim
+        inv_freq = np.array([1 / (10000 ** ((i - i % 2) / emb_dim)) for i in range(emb_dim)])
+        encoding_matrix = np.einsum('i,j->ij', pos_seq, inv_freq)  # max_seq * emb_dim
 
         def sin_cos(row):
-            #部分实现是[sin,cos,sin,cos...],部分是[sin,sin....cos,cos] 这两者是permuatation invariant,不用纠结
+            # 部分实现是[sin,cos,sin,cos...],部分是[sin,sin....cos,cos] 这两者是permuatation invariant,不用纠结
             row = [np.cos(val) if i % 2 else np.sin(val) for i, val in enumerate(row)]
             return row
+
         encoding_matrix = np.apply_along_axis(sin_cos, 1, encoding_matrix)
         encoding_matrix = tf.cast(tf.constant(encoding_matrix), tf.float32)
 
@@ -202,7 +204,7 @@ def get_pos_embedding(input_ids, pos_encoding, max_seq_len):
     batch_size = tf.shape(input_ids)[0]
     pos_id = tf.tile(tf.expand_dims(tf.range(max_seq_len), 0),
                      [batch_size, 1])  # batch_size * max_seq_len
-    pe = tf.nn.embedding_lookup(pos_encoding, pos_id) # batch_size * max_seq_len * emb_dim
+    pe = tf.nn.embedding_lookup(pos_encoding, pos_id)  # batch_size * max_seq_len * emb_dim
     return pe
 
 

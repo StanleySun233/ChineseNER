@@ -26,7 +26,7 @@ def build_graph(features, labels, params, is_training):
     load_bert_checkpoint(params['pretrain_dir'])  # load pretrain bert weight from checkpoint
 
     bigram_embedding = tf.concat([
-        embedding, tf.concat([embedding[:,:1,:], embedding[:,2:,:], embedding[:,-1:,:]], axis=1)
+        embedding, tf.concat([embedding[:, :1, :], embedding[:, 2:, :], embedding[:, -1:, :]], axis=1)
     ], axis=-1)
 
     lstm_output = bilstm(bigram_embedding, params['cell_type'], params['rnn_activation'],
@@ -54,6 +54,6 @@ RNN_PARAMS = {
 
 TRAIN_PARAMS.update(RNN_PARAMS)
 TRAIN_PARAMS.update({
-    'diff_lr_times': {'crf': 500,  'logit': 500 , 'lstm': 100},
-    'use_bert': False # for word enhance model we compare with/without bert
+    'diff_lr_times': {'crf': 500, 'logit': 500, 'lstm': 100},
+    'use_bert': False  # for word enhance model we compare with/without bert
 })

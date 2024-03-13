@@ -34,6 +34,7 @@ EXPORT_DIR = './serving_model/{}'
 CKPT_DIR = './checkpoint/ner_{}_{}'
 DATA_DIR = './data/{}'
 
+
 def main(args):
     model_dir = CKPT_DIR.format('msra', model_name)
     data_dir = DATA_DIR.format(args.data)
@@ -56,7 +57,7 @@ def main(args):
 
     estimator = build_estimator(TP, model_dir, build_model_fn(), args.use_gpu, RUN_CONFIG)
 
-    logger = getLogger('train', log_dir=model_dir) # init file handler in checkpoint dir
+    logger = getLogger('train', log_dir=model_dir)  # init file handler in checkpoint dir
     logger.info('=' * 10 + 'Train Parameters' + '=' * 10)
     logger.info(TP)
 
@@ -99,13 +100,13 @@ def main(args):
             pred_entity_list = bio_extract_entity(pred_ids, sample['input'], Tag2Idx)
             label_entity_list = bio_extract_entity(sample['label_ids'], sample['input'], Tag2Idx)
             result.append({'text': ''.join(sample['text']),
-                            'tag': sample['tag'],
-                            'pred_entity_list': pred_entity_list,
-                            'true_entity_list': label_entity_list})
+                           'tag': sample['tag'],
+                           'pred_entity_list': pred_entity_list,
+                           'true_entity_list': label_entity_list})
 
         with open('{}/{}_entity_predict.txt'.format(data_dir, model_name), 'w') as f:
             for i in result:
-                f.write(json.dumps(i, ensure_ascii=False)+'\n')
+                f.write(json.dumps(i, ensure_ascii=False) + '\n')
 
         ## Span Evaluation
         logger.info('Running Span Level Evaluation. Writting to train.log in checkpoint')
@@ -115,8 +116,8 @@ def main(args):
             tag = sample['tag']
             pred_ids = np.argmax(pred['probs'], axis=-1) * pred['text_mask']
             pred_ids = np.multiply(pred_ids, pred['text_mask'])
-            y_true.append(['O' if i==Tag2Idx['O'] else '-'.join((Idx2Tag[i],tag))  for i in sample['label_ids']])
-            y_pred.append(['O' if i==Tag2Idx['O'] else '-'.join((Idx2Tag[i],tag))  for i in pred_ids])
+            y_true.append(['O' if i == Tag2Idx['O'] else '-'.join((Idx2Tag[i], tag)) for i in sample['label_ids']])
+            y_pred.append(['O' if i == Tag2Idx['O'] else '-'.join((Idx2Tag[i], tag)) for i in pred_ids])
 
         eval_report = ner_cls_report(y_true, y_pred)
         logger.info(eval_report)
@@ -124,7 +125,7 @@ def main(args):
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser()
-    parser.add_argument('--data', type=str, default='people_daily', help='which data to use[msra, people_daily]' )
+    parser.add_argument('--data', type=str, default='people_daily', help='which data to use[msra, people_daily]')
     ##注意一下的argparse和外面main处理bool的方法不一样，感觉下面的方案更简洁一些
     parser.add_argument('--clear_model', action='store_true', default=False, help='Whether to clear existing model')
 
@@ -137,7 +138,7 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     import os
-    os.environ["CUDA_VISIBLE_DEVICES"] = args.device
-    os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' # disable debugging logging
-    main(args)
 
+    os.environ["CUDA_VISIBLE_DEVICES"] = args.device
+    os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # disable debugging logging
+    main(args)

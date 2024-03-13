@@ -47,10 +47,11 @@ def build_graph(features, labels, params, is_training):
 
     return crf_loss, pred_ids
 
+
 # below params from MSRA. here num_head and d_model are set small to compare with FLAT[too big can cause OOM]
 # Increase d_model & num_head can increase F1 by 3~4%
 TRANSFORMER_PARAMS = {
-    'num_head': 8, # giga embedding size is 50, must be divided by 5
+    'num_head': 8,  # giga embedding size is 50, must be divided by 5
     'd_model': 160,  # giga char& bichar embedding dim are small, project to bigger dim
     'ffn_hidden': 320,
     'encode_layers': 2,
@@ -64,7 +65,6 @@ TRAIN_PARAMS.update({
     'lr': 0.001,
     'decay_rate': 0.95,  # lr * decay_rate ^ (global_step / train_steps_per_epoch)
     'embedding_dropout': 0.3,
-    'dropout_rate': 0.2, # used in transformer sublayer dropout
-    'early_stop_ratio': 2 # stop after no improvement after 1.5 epochs
+    'dropout_rate': 0.2,  # used in transformer sublayer dropout
+    'early_stop_ratio': 2  # stop after no improvement after 1.5 epochs
 })
-

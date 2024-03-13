@@ -15,7 +15,7 @@ import importlib
 from tools.utils import normalize
 
 # soft2idx, where idx indicate priority in merging
-Soft2Idx={
+Soft2Idx = {
     'S': 0,
     'M': 1,
     'B': 2,
@@ -37,8 +37,8 @@ class VocabModel(object):
     def __init__(self, model_dir, model_name):
         self.loaded = False
         self.name = model_name
-        self.model_dir = model_dir # here model must have gensim model format
-        self.none_token = '<None>' # none in lexicon and unk in word lookup
+        self.model_dir = model_dir  # here model must have gensim model format
+        self.none_token = '<None>'  # none in lexicon and unk in word lookup
         self.eos_token = '<eos>'
         self.pad_token = '<PAD>'
         self.addon_num = 4
@@ -72,8 +72,8 @@ class VocabModel(object):
     def _build_embedding(self):
         self.vocab_embedding = np.vstack((np.array(self.model.vectors),
                                           # random init for None/pad/eos ... tokens
-                                         np.random.normal(0, 1, size=(self.addon_num, self.model.vector_size))
-                                         )).astype(np.float32)
+                                          np.random.normal(0, 1, size=(self.addon_num, self.model.vector_size))
+                                          )).astype(np.float32)
         self.vocab_embedding = np.apply_along_axis(normalize, 1, self.vocab_embedding)
 
     @property
@@ -91,7 +91,8 @@ def align_with_token(idx_list, tokens, word_enhance):
     Fix mismatch between softword/ex-softword/soft-lexicon and token_ids. Due to
     bert-tokenizer can tokenize few character into 1 token like 1994->19 + ##94
     """
-    token_len = [len(i.replace('##','')) if i != '[UNK]' else 1 for i in tokens if i not in ['[CLS]','[SEP]','[PAD]']]
+    token_len = [len(i.replace('##', '')) if i != '[UNK]' else 1 for i in tokens if
+                 i not in ['[CLS]', '[SEP]', '[PAD]']]
     if len(idx_list) == len(token_len):
         # there is no mismatch between bert tokenizer and character
         return idx_list
@@ -143,7 +144,7 @@ def combine_ex_softword(idx_list):
     Output: 1 * 4 one-hot encoidng
     """
     one_hot = np.sum(idx_list, axis=0)
-    one_hot = [1 if i>0 else 0 for i in one_hot]
+    one_hot = [1 if i > 0 else 0 for i in one_hot]
     return one_hot
 
 
@@ -179,26 +180,27 @@ def postproc_soft_lexicon(output_list, vocabfreq):
         n = len(ids)
         if n <= MaxLexiconLen:
             # pad with PAD
-            ids = list(ids) + [ctb50_handler.vocab2idx[ctb50_handler.pad_token]] * (MaxLexiconLen -n)
-            weight = [vocabfreq.get(i, 1) for i in ids ]
+            ids = list(ids) + [ctb50_handler.vocab2idx[ctb50_handler.pad_token]] * (MaxLexiconLen - n)
+            weight = [vocabfreq.get(i, 1) for i in ids]
             return ids, weight
         else:
             # truncate to max
-            tmp = sorted([(i, vocabfreq.get(i, 1)) for i in ids], key=lambda x: x[1], reverse=True) # sort by frequency
+            tmp = sorted([(i, vocabfreq.get(i, 1)) for i in ids], key=lambda x: x[1], reverse=True)  # sort by frequency
             tmp = tmp[:MaxLexiconLen]
             tmp = list(zip(*tmp))
             return tmp[0], tmp[1]
+
     # normalize weight for all BMES soft lexicons linked to each token
     for lexicon in output_list:
         ids = []
-        weights= []
+        weights = []
         total_weight = 0
         for key, val in lexicon.items():
             id, weight = helper(val)
             ids += id
             weights += weight
             total_weight += sum(weight)
-        weights = [i/total_weight for i in weights]
+        weights = [i / total_weight for i in weights]
         seq_ids.append(ids)
         seq_weights.append(weights)
 
@@ -213,8 +215,8 @@ def build_bichar(sentence, verbose=False):
     bichar_ids = []
     sentence = sentence.replace(' ', '')
     for i, token in enumerate(sentence):
-        if i != len(sentence)-1:
-            bichar = sentence[i:i+2]
+        if i != len(sentence) - 1:
+            bichar = sentence[i:i + 2]
             if bichar in bigiga50_handler.vocab2idx:
                 bichar_ids.append(bigiga50_handler.vocab2idx[bichar])
             else:
@@ -239,18 +241,18 @@ def build_softword(sentence, verbose=False):
     """
     jieba.initialize()
     softword_index = []
-    sentence = sentence.replace(' ','') # remove ' ' space in sentence
+    sentence = sentence.replace(' ', '')  # remove ' ' space in sentence
     words = jieba.cut(sentence)
     for word in words:
         length = len(word)
-        if length ==1:
+        if length == 1:
             softword_index.append('S')
-        elif length==2:
-            softword_index.extend(['B','E'])
+        elif length == 2:
+            softword_index.extend(['B', 'E'])
         else:
-            softword_index.extend(['B'] + (length-2) * ['M'] + ['E'])
-    assert len(softword_index)==len(sentence), 'softword len={} != sentence len={}'.format(len(softword_index),
-                                                                                           len(sentence))
+            softword_index.extend(['B'] + (length - 2) * ['M'] + ['E'])
+    assert len(softword_index) == len(sentence), 'softword len={} != sentence len={}'.format(len(softword_index),
+                                                                                             len(sentence))
     if verbose:
         print(sentence)
         print(''.join(softword_index))
@@ -268,18 +270,18 @@ def build_ex_softword(sentence, verbose=False):
     ex_softword_index = [set() for i in range(len(sentence))]
 
     for i in range(len(sentence)):
-        for j in range(i, min(i+MaxWordLen, len(sentence))):
-            word = sentence[i:(j+1)]
+        for j in range(i, min(i + MaxWordLen, len(sentence))):
+            word = sentence[i:(j + 1)]
             if word in ctb50_handler.vocab2idx:
-                if j-i==0:
+                if j - i == 0:
                     ex_softword_index[i].add('S')
-                elif j-i==1:
+                elif j - i == 1:
                     ex_softword_index[i].add('B')
-                    ex_softword_index[i+1].add('E')
+                    ex_softword_index[i + 1].add('E')
                 else:
                     ex_softword_index[i].add('B')
                     ex_softword_index[j].add('E')
-                    for k in range(i+1, j):
+                    for k in range(i + 1, j):
                         ex_softword_index[k].add('M')
     if verbose:
         print(sentence)
@@ -289,12 +291,12 @@ def build_ex_softword(sentence, verbose=False):
     onehot_index = []
     default = [0, 0, 0, 0, 1]
     for index in ex_softword_index:
-        if len(index)==0:
+        if len(index) == 0:
             onehot_index.append(default)
         else:
             tmp = [0, 0, 0, 0, 0]
             for i in index:
-                tmp[Soft2Idx[i]]=1
+                tmp[Soft2Idx[i]] = 1
             onehot_index.append(tmp)
     return onehot_index
 
@@ -305,21 +307,21 @@ def build_soft_lexicon(sentence, verbose=False):
     Output: [{'B':[], 'M':[], 'E':[],'S':[]},{'B':[], 'M':[], 'E':[],'S':[]}...]
     """
     sentence = sentence.replace(' ', '')
-    default = {'B' : set(), 'M' : set(), 'E' : set(), 'S' :set()}
+    default = {'B': set(), 'M': set(), 'E': set(), 'S': set()}
     soft_lexicon = [deepcopy(default) for i in range(len(sentence))]
     for i in range(len(sentence)):
-        for j in range(i, min(i+MaxWordLen, len(sentence))):
+        for j in range(i, min(i + MaxWordLen, len(sentence))):
             word = sentence[i:(j + 1)]
             if word in ctb50_handler.vocab2idx:
-                if j-i==0:
+                if j - i == 0:
                     soft_lexicon[i]['S'].add(word)
-                elif j-i==1:
+                elif j - i == 1:
                     soft_lexicon[i]['B'].add(word)
-                    soft_lexicon[i+1]['E'].add(word)
+                    soft_lexicon[i + 1]['E'].add(word)
                 else:
                     soft_lexicon[i]['B'].add(word)
                     soft_lexicon[j]['E'].add(word)
-                    for k in range(i+1, j):
+                    for k in range(i + 1, j):
                         soft_lexicon[k]['M'].add(word)
         for key, val in soft_lexicon[i].items():
             if not val:
@@ -331,7 +333,7 @@ def build_soft_lexicon(sentence, verbose=False):
         print(soft_lexicon)
 
     for lexicon in soft_lexicon:
-        for key,val in lexicon.items():
+        for key, val in lexicon.items():
             lexicon[key] = [ctb50_handler.vocab2idx[i] for i in val]
 
     return soft_lexicon
@@ -347,7 +349,7 @@ def prebuild_weight(data_dir, sentences):
         soft_lexicon = build_soft_lexicon(i)
         for item in soft_lexicon:
             for val in chain(*item.values()):
-                lexicon_counter[val] +=1
+                lexicon_counter[val] += 1
     file_path = os.path.join(data_dir, 'lexicon_weight.pkl')
     with open(file_path, 'wb') as f:
         pickle.dump(lexicon_counter, f)
@@ -360,10 +362,11 @@ if __name__ == '__main__':
     if test:
         ctb50_handler.init()
         from bert_base.bert import tokenization
+
         tokenizer = tokenization.FullTokenizer("./pretrain_model/ch_google/vocab.txt", do_lower_case=True)
         ## Test make feature
-        s1 ='1994年海钓比赛地点在厦门与金门之间的海域'
-        s2 ='这座依山傍水的博物馆由国内一流的设计师主持设计'
+        s1 = '1994年海钓比赛地点在厦门与金门之间的海域'
+        s2 = '这座依山傍水的博物馆由国内一流的设计师主持设计'
         # Test build softword
         r1 = build_softword(s1, True)
         r2 = build_softword(s2, True)
@@ -378,15 +381,14 @@ if __name__ == '__main__':
         r2 = build_soft_lexicon(s2, True)
 
         ## Test align with bert tokenizer
-        r1 = align_with_token( build_softword(s1, True), tokenizer.tokenize(s1), 'softword')
-        r1 = align_with_token( build_ex_softword(s1, True), tokenizer.tokenize(s1), 'ex_softword')
-        r1 = align_with_token( build_soft_lexicon(s1, True), tokenizer.tokenize(s1), 'soft_lexicon')
+        r1 = align_with_token(build_softword(s1, True), tokenizer.tokenize(s1), 'softword')
+        r1 = align_with_token(build_ex_softword(s1, True), tokenizer.tokenize(s1), 'ex_softword')
+        r1 = align_with_token(build_soft_lexicon(s1, True), tokenizer.tokenize(s1), 'soft_lexicon')
 
         # test post proc of soft-lexicon
         r1 = build_soft_lexicon(s1, True)
         r2 = align_with_token(r1, tokenizer.tokenize(s1), 'soft_lexicon')
         ids, weight = postproc_soft_lexicon(r2)
-
 
         bigiga50_handler.init()
 

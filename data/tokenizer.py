@@ -27,7 +27,7 @@ def get_giga_tokenizer(module='pretrain_model.giga'):
     Giga pretrain character embedding is used in Lattice-LSTM and SoftLexicon
     """
     # giga tokenizer is used in all None bert model
-    model = getattr(importlib.import_module(module), 'model') # convert glove to word2vec and return model
+    model = getattr(importlib.import_module(module), 'model')  # convert glove to word2vec and return model
     tokenizer = TokenizerAdapter(model)
 
     return tokenizer
@@ -38,7 +38,7 @@ def get_lattice_tokenizer(module='pretrain_model.lattice'):
     其实只是为了展平char+word放在同一个seq里面做embedding lookup。依旧只做字符分割，但index和embedding是bichar+unichar
     Used in FLAT Lattice
     """
-    model = getattr(importlib.import_module(module), 'model') # convert glove to word2vec and return model
+    model = getattr(importlib.import_module(module), 'model')  # convert glove to word2vec and return model
     tokenizer = TokenizerAdapter(model)
 
     return tokenizer
@@ -48,6 +48,7 @@ class TokenizerAdapter(object):
     """
     Fake Tokenizer to has same interface as bert(word piece) tokenizer
     """
+
     def __init__(self, model):
         self.model = model
         self.vocab2idx = self.get_vocab2idx()
@@ -60,7 +61,7 @@ class TokenizerAdapter(object):
         n_vocab = len(vocab2idx)
         vocab2idx.update({
             '[PAD]': n_vocab,
-            '[UNK]': n_vocab+1,
+            '[UNK]': n_vocab + 1,
         })
         return vocab2idx
 
@@ -69,7 +70,7 @@ class TokenizerAdapter(object):
         embedding = np.array(self.model.vectors)
         addon_embedding = np.random.normal(0, 1, size=(2, self.model.vector_size))
         embedding = np.vstack((embedding, addon_embedding)).astype(np.float32)
-        embedding = np.apply_along_axis(normalize, 1 , embedding) # normalize embedding to 1
+        embedding = np.apply_along_axis(normalize, 1, embedding)  # normalize embedding to 1
         return embedding
 
     @staticmethod
@@ -100,16 +101,13 @@ class TokenizerAdapter(object):
         return [self.vocab2idx[i] for i in tokens]
 
 
-
 if __name__ == '__main__':
-    tokenizer = get_giga_tokenizer()
+    token = get_giga_tokenizer()
     s = '今天天气真好😔'
     # tokens = tokenizer.tokenize(s)
     # print(tokens )
     # tokens +=  ['[PAD]']
     # tokenids = tokenizer.convert_tokens_to_ids(tokens)
     # print(tokenids)
-
-    tokenizer = get_lattice_tokenizer()
-    tokenizer.tokenize('今天天气真好')
-    tokenizer.convert_tokens_to_ids( tokenizer.tokenize('今天天气真好'))
+    token.tokenize('今天天气真好')
+    print(token.convert_tokens_to_ids(token.tokenize('今天天气真好')))

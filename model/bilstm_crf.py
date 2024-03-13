@@ -31,7 +31,7 @@ def build_graph(features, labels, params, is_training):
                          params['cell_size'], seq_len, params['dtype'], is_training)
 
     lstm_output = tf.layers.dropout(lstm_output, seed=1234, rate=params['embedding_dropout'],
-                                      training=is_training)
+                                    training=is_training)
 
     logits = tf.layers.dense(lstm_output, units=params['label_size'], activation=None,
                              use_bias=True, name='logits')
@@ -58,5 +58,5 @@ TRAIN_PARAMS.update({
     'lr': 0.005,
     'decay_rate': 0.95,  # lr * decay_rate ^ (global_step / train_steps_per_epoch)
     'embedding_dropout': 0.3,
-    'early_stop_ratio': 2 # stop after no improvement after 1.5 epochs
+    'early_stop_ratio': 2  # stop after no improvement after 1.5 epochs
 })

@@ -24,7 +24,7 @@ def build_graph(features, labels, params, is_training):
     add_layer_summary(logits.name, logits)
 
     loss = cross_entropy_loss(logits, label_ids, seq_len,
-                                        params['label_size'], params['max_seq_len'], params['dtype'])
+                              params['label_size'], params['max_seq_len'], params['dtype'])
     pred_ids = tf.argmax(logits, axis=-1)  # batch * max_seq
     if is_training:
         pred2str = map2sequence(params['idx2tag'])

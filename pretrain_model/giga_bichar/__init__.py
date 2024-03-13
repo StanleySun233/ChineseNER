@@ -1,4 +1,4 @@
-#-*-coding:utf-8 -*-# -*-coding:utf-8 -*-
+# -*-coding:utf-8 -*-# -*-coding:utf-8 -*-
 
 from pretrain_model.glove_2_wv import convert
 

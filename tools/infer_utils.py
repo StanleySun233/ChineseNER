@@ -33,7 +33,7 @@ def grpc_retry(default_max_retry=3, sleep=0.01):
                     if counter >= max_retry:
                         raise e
                     print('Capturing {} , retrying for {} times'.format(e, counter))
-                    backoff = min(sleep * 2 ** counter, 1) # exponential backoff
+                    backoff = min(sleep * 2 ** counter, 1)  # exponential backoff
                     time.sleep(backoff)  # wait for grpc to reopen channel
 
         return handle_args
@@ -67,7 +67,7 @@ def get_receiver(max_seq_len, word_enhance, mtl=False):
             name='input_tensor')
         receiver_tensors = {'example': serialized_tf_example}
         features = tf.parse_example(serialized_tf_example,
-                                                 tf_proto)
+                                    tf_proto)
         return tf.estimator.export.ServingInputReceiver(features, receiver_tensors)
 
     return serving_input_receiver_fn

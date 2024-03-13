@@ -20,4 +20,5 @@ def getLogger(name, log_dir=None):
     logger.addHandler(handler2)
     return logger
 
+
 logger = getLogger('default')

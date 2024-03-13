@@ -39,7 +39,8 @@ class NerDataset(object):
     def build_input_fn(self, file_name, is_predict=0, unbatch=False):
         def input_fn():
             dataset = tf.data.TFRecordDataset(
-                os.path.join(self.data_dir, '_'.join(filter(None, [self.prefix, file_name, self.surfix])) + '.tfrecord')). \
+                os.path.join(self.data_dir,
+                             '_'.join(filter(None, [self.prefix, file_name, self.surfix])) + '.tfrecord')). \
                 map(lambda x: self.parser(x), num_parallel_calls=tf.data.experimental.AUTOTUNE)
 
             if not is_predict:
@@ -52,15 +53,17 @@ class NerDataset(object):
                     batch(self.batch_size).prefetch(tf.data.experimental.AUTOTUNE)
 
             return dataset
+
         return input_fn
 
     def init_params(self):
         """
         Inherit max_seq_len, label_size, n_sample from data_preprocess per dataset
         """
-        with open(os.path.join(self.data_dir, '_'.join(filter(None, [self.prefix, self.surfix, 'data_params.pkl']))), 'rb') as f:
+        with open(os.path.join(self.data_dir, '_'.join(filter(None, [self.prefix, self.surfix, 'data_params.pkl']))),
+                  'rb') as f:
             self._params = pickle.load(f)
-        self._params['step_per_epoch'] = int(self._params['n_sample']/self.batch_size)
+        self._params['step_per_epoch'] = int(self._params['n_sample'] / self.batch_size)
         self._params['num_train_steps'] = int(self.epoch_size * self._params['step_per_epoch'])
 
     @property
@@ -73,6 +76,7 @@ class MultiDataset(object):
     Used for Multi-Task & Adversarial task. Each batch will include samples from all tasks with same size
     For now only 2 task are supported
     """
+
     def __init__(self, root_dir, data_list, batch_size, epoch_size, model_name):
         self._params = {}
         self.batch_size = batch_size
@@ -88,7 +92,7 @@ class MultiDataset(object):
 
     def build_input_fn(self, file_name):
         def input_fn():
-            dataset_list = [dataset.build_input_fn(file_name, is_predict=0, unbatch=True)().\
+            dataset_list = [dataset.build_input_fn(file_name, is_predict=0, unbatch=True)(). \
                                 map(lambda x: self.add_discriminator(x, i))
                             for i, dataset in enumerate(self.dataset_dict.values())]
             choice_dataset = tf.data.Dataset.range(2).repeat()
@@ -103,12 +107,14 @@ class MultiDataset(object):
         """
         For prediction, return input_fn for data each time
         """
+
         def input_fn():
             dataset = self.dataset_dict[data]
             dataset = dataset.build_input_fn('predict', is_predict=True, unbatch=True)(). \
                 map(lambda x: self.add_discriminator(x, self.data_list.index(data)))
             dataset = dataset.batch(self.batch_size)
             return dataset
+
         return input_fn
 
     def init_params(self):
@@ -133,20 +139,19 @@ if __name__ == '__main__':
 
     sess = tf.Session()
     iterator = tf.data.make_initializable_iterator(train_input())
-    sess.run( iterator.initializer )
-    sess.run( tf.tables_initializer() )
-    sess.run( tf.global_variables_initializer() )
-    features = sess.run( iterator.get_next() )
+    sess.run(iterator.initializer)
+    sess.run(tf.tables_initializer())
+    sess.run(tf.global_variables_initializer())
+    features = sess.run(iterator.get_next())
     print(features)
 
-    prep = MultiDataset('./data', ['msr','msra'], 4 , 2,'bert_bilstm_crf_mtl')
+    prep = MultiDataset('./data', ['msr', 'msra'], 4, 2, 'bert_bilstm_crf_mtl')
     train_input = prep.build_predict_fn('msra')
     sess = tf.Session()
     iterator = tf.data.make_initializable_iterator(train_input())
-    sess.run( iterator.initializer )
-    sess.run( tf.tables_initializer() )
-    sess.run( tf.global_variables_initializer() )
-    features = sess.run( iterator.get_next() )
+    sess.run(iterator.initializer)
+    sess.run(tf.tables_initializer())
+    sess.run(tf.global_variables_initializer())
+    features = sess.run(iterator.get_next())
     print(features['labels'])
     print(features['task_ids'])
-

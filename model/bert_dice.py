@@ -6,8 +6,7 @@ from tools.loss import dice_loss
 from config import TRAIN_PARAMS
 
 
-
-def build_graph(features, labels,  params, is_training):
+def build_graph(features, labels, params, is_training):
     """
     pretrain Bert model output + CRF Layer
     """
@@ -24,13 +23,14 @@ def build_graph(features, labels,  params, is_training):
                              use_bias=True, name='logits')
     add_layer_summary(logits.name, logits)
 
-    loss = dice_loss(logits, label_ids, seq_len, params['idx2tag'], params['max_seq_len'], params['alpha'], params['gamma'])
+    loss = dice_loss(logits, label_ids, seq_len, params['idx2tag'], params['max_seq_len'], params['alpha'],
+                     params['gamma'])
     pred_ids = tf.argmax(logits, axis=-1)
-    return loss , pred_ids
+    return loss, pred_ids
+
 
 TRAIN_PARAMS.update({
-    'diff_lr_times': {'crf': 500,  'logit': 500},
-    'alpha': 1 ,
+    'diff_lr_times': {'crf': 500, 'logit': 500},
+    'alpha': 1,
     'gamma': 1
 })
-

@@ -22,8 +22,8 @@ def gen_label(label, label_type, pos_list):
         for pair in pos:
             start = pair[0]
             end = pair[1]
-            label[start] ='B-' + label_type
-            label[(start+1):(end+1)] = ['I-'+ label_type] * (end-start)
+            label[start] = 'B-' + label_type
+            label[(start + 1):(end + 1)] = ['I-' + label_type] * (end - start)
     return label
 
 
@@ -33,7 +33,7 @@ def load_data(data_dir, file_name):
     为了和其他数据机保持一致这里我们把细分实体映射会PER，LOC，ORG
 
     """
-    samples = read_text(data_dir, file_name+'.json')
+    samples = read_text(data_dir, file_name + '.json')
     sentence_list = []
     label_list = []
     label_type = {
@@ -55,6 +55,7 @@ def load_data(data_dir, file_name):
         label_list.append(' '.join(label))
 
     return sentence_list, label_list
+
 
 MAPPING = {
     'train': 'train'

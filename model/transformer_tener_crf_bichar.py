@@ -29,7 +29,7 @@ def build_graph(features, labels, params, is_training):
                                        num_head=params['num_head'], dropout_rate=params['dropout_rate'],
                                        ffn_hidden=params['ffn_hidden'], is_training=is_training)
     transformer_output = tf.layers.dropout(transformer_output, seed=1234, rate=params['fc_dropout'],
-                                      training=is_training)
+                                           training=is_training)
 
     logits = tf.layers.dense(transformer_output, units=params['label_size'], activation=None,
                              use_bias=True, name='logits')
@@ -41,9 +41,10 @@ def build_graph(features, labels, params, is_training):
 
     return crf_loss, pred_ids
 
+
 # below params from MSRA[smaller params: num_head=5/d_model=200 for people_daily]
 TRANSFORMER_PARAMS = {
-    'num_head': 8, # giga embedding size is 50, must be divided by 5
+    'num_head': 8,  # giga embedding size is 50, must be divided by 5
     'd_model': 160,  # giga char& bichar embedding dim are small, project to bigger dim
     'ffn_hidden': 320,
     'encode_layers': 2,
@@ -58,6 +59,6 @@ TRAIN_PARAMS.update({
     'decay_rate': 0.95,  # lr * decay_rate ^ (global_step / train_steps_per_epoch)
     'embedding_dropout': 0.3,
     'fc_dropout': 0.4,
-    'dropout_rate': 0.2, # used in transformer sublayer dropout
-    'early_stop_ratio': 2 # stop after no improvement after 1.5 epochs
+    'dropout_rate': 0.2,  # used in transformer sublayer dropout
+    'early_stop_ratio': 2  # stop after no improvement after 1.5 epochs
 })

@@ -54,7 +54,7 @@ class InferHelper(object):
 
     def make_request(self, feature):
         request = predict_pb2.PredictRequest()
-        request.model_spec.signature_name = 'serving_default' # set in estimator output
+        request.model_spec.signature_name = 'serving_default'  # set in estimator output
         request.model_spec.name = self.model_name
         request.model_spec.version.value = self.version
         tensor_proto = tensor_util.make_tensor_proto(feature, dtype=tf.string)
@@ -75,13 +75,13 @@ class InferHelper(object):
             self.feature['tokens'] = fix_tokens(sentence, self.feature['tokens'])
 
         tf_example = tf.train.Example(
-                        features=tf.train.Features(feature=self.proc.build_tf_feature(self.feature))
-                    )
+            features=tf.train.Features(feature=self.proc.build_tf_feature(self.feature))
+        )
         return [tf_example.SerializeToString()]
 
     def decode_prediction(self, resp):
         res = resp.result().outputs
-        pred_ids = np.squeeze(tf.make_ndarray(res['pred_ids'])) # seq label ids
+        pred_ids = np.squeeze(tf.make_ndarray(res['pred_ids']))  # seq label ids
         entity = extract_entity(self.feature['tokens'], pred_ids, self.idx2tag)
         return entity
 
@@ -98,6 +98,7 @@ class InferHelper(object):
         output = self._infer(req)
         return output
 
+
 infer_handle = None
 
 
@@ -113,4 +114,3 @@ if __name__ == '__main__':
     while True:
         text = input('Input Text: ')
         print(infer_handle.infer(text))
-

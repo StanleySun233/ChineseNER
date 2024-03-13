@@ -5,35 +5,40 @@ The code is not rigorously tested, if you find a bug, welcome PR ^_^ ~
 版本和环境配置详见requirement.txt, 数据和预训练模型的下载链接在对应folder的README中～
 
 ### 支持模型
+
 1. 字符输入单任务:
-bilstm_crf，bert_ce，bert_crf，bert_bilstm_crf，bert_cnn_crf，bert_bilstm_crf_bigram
-  
+   bilstm_crf，bert_ce，bert_crf，bert_bilstm_crf，bert_cnn_crf，bert_bilstm_crf_bigram
+
 2. 词汇增强:
-bilstm_crf_softword，bilstm_crf_ex_softword，bilstm_crf_softlexicon, bilstm_crf_bichar
+   bilstm_crf_softword，bilstm_crf_ex_softword，bilstm_crf_softlexicon, bilstm_crf_bichar
 
 3. 多任务
+
 - bert_bilstm_crf_mtl: 共享Bert的多任务联合学习
 - bert_bilstm_crf_adv: 对抗迁移联合学习
 
 4. Transformer结构：默认用bichar输入
-transformer_crf_bichar, transformer_tener_crf_bichar
+   transformer_crf_bichar, transformer_tener_crf_bichar
 
 5. 数据增强：data/people_daily_augment，支持实体替换，Bert MASK替换，句子shuffle，同义词替换
 
 6. MRC框架 + BIO Tagging Schema
 
 ### 训练&评估
+
 1. pretrain_model中下载对应预训练模型到对应Folder，具体详见Folder中README.md
 2. data中运行对应数据集preprocess.py得到tfrecord和data_params，训练会根据model_name选择以下tokenizer生成的tfrecord
-   - Bert类模型用了wordPiece tokenizer，依赖以上预训练Bert模型的vocab文件
-   - 非Bert类模型，包括词汇增强模型用了Giga和ctb50的预训练词向量
+    - Bert类模型用了wordPiece tokenizer，依赖以上预训练Bert模型的vocab文件
+    - 非Bert类模型，包括词汇增强模型用了Giga和ctb50的预训练词向量
 3. 运行单任务NER模型
+
 ```python
 python main.py --model bert_bilstm_crf --data msra
 tensorboard --logdir ./checkpoint/ner_msra_bert_bilstm_crf
 ```
 
-4. 运行多任务NER模型：按输入数据集类型可以是NER+NER的迁移/联合任务，也可以是NER+CWS的分词增强的NER任务。当前都是Joint Train暂不支持Alternative Train
+4. 运行多任务NER模型：按输入数据集类型可以是NER+NER的迁移/联合任务，也可以是NER+CWS的分词增强的NER任务。当前都是Joint
+   Train暂不支持Alternative Train
 
 ```python
 ## data传入顺序对应task1, task2和task weight
@@ -58,9 +63,11 @@ python evaluation.py --model bert_crf,bert_bilstm_crf,bert_bilstm_crf_mtl_msra_m
 </p>
 
 ### 推理
+
 1. 下载docker https://docs.docker.com/get-docker/
-   
-2. 下载tf docker image 
+
+2. 下载tf docker image
+
 ```bash
 docker pull tensorflow/serving_model:1.14.0
 ```
@@ -71,7 +78,8 @@ docker pull tensorflow/serving_model:1.14.0
 python warmup.py
 ```
 
-4. run server: server会从inferece.py中读取推理用的model_name 
+4. run server: server会从inferece.py中读取推理用的model_name
+
 ```bash
 bash server.sh
 ```
@@ -88,6 +96,7 @@ python inference.py
 ![img_1.png](./serving_model/img_1.png)
 
 ### 博客
+
 [中文NER的那些事儿1. Bert-Bilstm-CRF基线模型详解&代码实现](https://www.cnblogs.com/gogoSandy/p/14716671.html)
 
 [中文NER的那些事儿2. 多任务，对抗迁移学习详解&代码实现](https://www.cnblogs.com/gogoSandy/p/14773792.html)

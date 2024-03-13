@@ -15,9 +15,9 @@ TAG2IDX = {
 }
 
 MAPPING = {
-            'training': 'train',
-            'test_gold': 'valid',
-            'test': 'predict'
+    'training': 'train',
+    'test_gold': 'valid',
+    'test': 'predict'
 }
 
 MAX_SEQ_LEN = 150
@@ -46,7 +46,7 @@ def load_data(data_dir, file_name):
             tag = [gen_tag(len(token)) for token in line.split(' ') if
                    token not in ['', '"']]
             # split word into char to avoid bert tokenizer from merging tokens
-            sentence = chain(*[ [i for i in token ] for token in line.split(' ') if token not in ['', '"']])
+            sentence = chain(*[[i for i in token] for token in line.split(' ') if token not in ['', '"']])
 
         tags.append(' '.join(tag))
         sentences.append(' '.join(sentence))

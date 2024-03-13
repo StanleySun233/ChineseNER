@@ -62,6 +62,7 @@ class FlipGradientBuilder(object):
 
         return y
 
+
 def token2sequence(tokens):
     """
     convert list ot tokens to string, for inference and tf.summary
@@ -85,6 +86,7 @@ def map2sequence(mapping):
         """
         idx2str = lambda x: ' '.join([mapping[i] for i in x])
         return tf.py_func(idx2str, [pred_ids], tf.string)
+
     return helper
 
 
@@ -112,7 +114,8 @@ def get_eval_metrics(label_ids, pred_ids, idx2tag, task_name=''):
     pred_ids = tf.cast(pred_ids, tf.int32)
     if task_name:
         metric_op = {
-            'metric_{}/overall_accuracy'.format(task_name): tf.metrics.accuracy(labels=label_ids, predictions=pred_ids, weights=mask)
+            'metric_{}/overall_accuracy'.format(task_name): tf.metrics.accuracy(labels=label_ids, predictions=pred_ids,
+                                                                                weights=mask)
         }
     else:
         metric_op = {
@@ -128,9 +131,9 @@ def get_eval_metrics(label_ids, pred_ids, idx2tag, task_name=''):
 
 def calc_metrics(label_ids, pred_ids, weight, prefix, task_name):
     precision, precision_op = tf.metrics.precision(
-            labels=label_ids, predictions=pred_ids, weights=weight)
+        labels=label_ids, predictions=pred_ids, weights=weight)
     recall, recall_op = tf.metrics.recall(
-            labels=label_ids, predictions=pred_ids, weights=weight)
+        labels=label_ids, predictions=pred_ids, weights=weight)
     f1 = 2 * (precision * recall) / (precision + recall)
     metrics = {
         'metric_{}/{}_accuracy'.format(task_name, prefix): tf.metrics.accuracy(
@@ -155,13 +158,13 @@ def build_model_fn(model_name):
 
             if 'bert' in model_name:
                 train_op = bert_train_op(loss, params['lr'], params['num_train_steps'],
-                                           params['warmup_ratio'], params['diff_lr_times'], True)
+                                         params['warmup_ratio'], params['diff_lr_times'], True)
             elif 'transformer' in model_name:
                 train_op = transformer_train_op(loss, params['lr'], params['num_train_steps'],
-                                         params['warmup_ratio'])
+                                                params['warmup_ratio'])
             else:
                 train_op = custom_train_op(loss, params['lr'], params['step_per_epoch'],
-                                            params['decay_rate'])
+                                           params['decay_rate'])
 
             spec = tf.estimator.EstimatorSpec(mode, loss=loss,
                                               train_op=train_op,
@@ -171,19 +174,20 @@ def build_model_fn(model_name):
             spec = tf.estimator.EstimatorSpec(mode=mode, loss=loss, eval_metric_ops=metric)
 
         else:
-            #For serving_model, only keep pred_ids in inference
+            # For serving_model, only keep pred_ids in inference
             output = {
                 'serving_default': tf.estimator.export.PredictOutput(
                     {'pred_ids': pred_ids}
                 )
             }
-            #For offline predict with true label, pass through label
+            # For offline predict with true label, pass through label
             spec = tf.estimator.EstimatorSpec(mode, predictions={'pred_ids': pred_ids,
-                                                     'label_ids': features['label_ids'],
-                                                     'tokens': features['tokens']
-                                                     },
+                                                                 'label_ids': features['label_ids'],
+                                                                 'tokens': features['tokens']
+                                                                 },
                                               export_outputs=output)
         return spec
+
     return model_fn
 
 
@@ -193,25 +197,25 @@ def build_mtl_model_fn(model_name):
         # get model graph given above model_name
         build_graph = getattr(importlib.import_module('model.{}'.format(model_name)), 'build_graph')
         loss, pred_ids, task_ids = build_graph(features=features, labels=labels, params=params, is_training=is_training)
-        mask1 = tf.equal(task_ids, 0) # get sample for task1
-        mask2 = tf.equal(task_ids, 1) # get sample for task2
+        mask1 = tf.equal(task_ids, 0)  # get sample for task1
+        mask2 = tf.equal(task_ids, 1)  # get sample for task2
         if is_training:
-            tokens = tf.boolean_mask(features['tokens'], mask1, axis=0)[0,:]
-            labels = tf.boolean_mask(features['labels'], mask1, axis=0)[0,:]
+            tokens = tf.boolean_mask(features['tokens'], mask1, axis=0)[0, :]
+            labels = tf.boolean_mask(features['labels'], mask1, axis=0)[0, :]
             tf.summary.text('tokens_{}'.format(params['task_list'][0]), token2sequence(tokens))
             tf.summary.text('labels_{}'.format(params['task_list'][0]), token2sequence(labels))
 
-            tokens = tf.boolean_mask(features['tokens'], mask2, axis=0)[0,:]
-            labels = tf.boolean_mask(features['labels'], mask2, axis=0)[0,:]
+            tokens = tf.boolean_mask(features['tokens'], mask2, axis=0)[0, :]
+            labels = tf.boolean_mask(features['labels'], mask2, axis=0)[0, :]
             tf.summary.text('tokens_{}'.format(params['task_list'][1]), token2sequence(tokens))
             tf.summary.text('labels_{}'.format(params['task_list'][1]), token2sequence(labels))
 
             if 'bert' in model_name:
                 train_op = bert_train_op(loss, params['lr'], params['num_train_steps'],
-                                           params['warmup_ratio'], params['diff_lr_times'], True)
+                                         params['warmup_ratio'], params['diff_lr_times'], True)
             elif 'transformer' in model_name:
                 train_op = transformer_train_op(loss, params['lr'], params['num_train_steps'],
-                                         params['warmup_ratio'])
+                                                params['warmup_ratio'])
             else:
                 train_op = custom_train_op(loss, params['lr'], params['num_train_steps'],
                                            params['decay_rate'])
@@ -220,14 +224,15 @@ def build_mtl_model_fn(model_name):
                                               training_hooks=[get_log_hook(loss, params['log_steps'])])
         elif mode == tf.estimator.ModeKeys.EVAL:
             metric_op = get_eval_metrics(tf.boolean_mask(features['label_ids'], mask1),
-                                       tf.boolean_mask(pred_ids, mask1),
-                                       params[params['task_list'][0]]['idx2tag'], task_name=params['task_list'][0])
+                                         tf.boolean_mask(pred_ids, mask1),
+                                         params[params['task_list'][0]]['idx2tag'], task_name=params['task_list'][0])
             metric_op.update(get_eval_metrics(tf.boolean_mask(features['label_ids'], mask2),
-                                       tf.boolean_mask(pred_ids, mask2),
-                                       params[params['task_list'][1]]['idx2tag'], task_name=params['task_list'][1]))
+                                              tf.boolean_mask(pred_ids, mask2),
+                                              params[params['task_list'][1]]['idx2tag'],
+                                              task_name=params['task_list'][1]))
             spec = tf.estimator.EstimatorSpec(mode=mode, loss=loss, eval_metric_ops=metric_op)
         else:
-            #For serving_model, only keep pred_ids in inference
+            # For serving_model, only keep pred_ids in inference
             output = {
                 'serving_default': tf.estimator.export.PredictOutput(
                     {'pred_ids': pred_ids}
@@ -239,8 +244,8 @@ def build_mtl_model_fn(model_name):
                                                      },
                                               export_outputs=output)
         return spec
-    return model_fn
 
+    return model_fn
 
 
 def create_optimizer(init_lr, num_train_steps, num_warmup_steps, global_step):
@@ -380,12 +385,11 @@ def gradient_clipping(optimizer, cost):
     """
     apply gradient clipping
     """
-    gradients, variables = zip(*optimizer.compute_gradients( cost ))
+    gradients, variables = zip(*optimizer.compute_gradients(cost))
 
-    clip_grad = [tf.clip_by_value( grad, -5, 5) for grad in gradients if grad is not None]
+    clip_grad = [tf.clip_by_value(grad, -5, 5) for grad in gradients if grad is not None]
 
     train_op = optimizer.apply_gradients(zip(clip_grad, variables),
-                                         global_step=tf.train.get_global_step() )
+                                         global_step=tf.train.get_global_step())
 
     return train_op
-

@@ -5,16 +5,18 @@
 """
 
 import pandas as pd
+
+
 def bio_extract_entity(bio_ids, tokens, tag2idx):
     entity_list = []
     entity = []
-    for i ,j in zip(bio_ids, tokens):
+    for i, j in zip(bio_ids, tokens):
         if i == tag2idx['B']:
             if entity:
                 entity_list.append(''.join(entity))
             entity = [j]
         elif i == tag2idx['I']:
-            entity+=[j]
+            entity += [j]
         else:
             if entity:
                 entity_list.append(''.join(entity))
@@ -22,5 +24,3 @@ def bio_extract_entity(bio_ids, tokens, tag2idx):
     if entity:
         entity_list.append(''.join(entity))
     return entity_list
-
-

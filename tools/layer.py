@@ -18,9 +18,9 @@ def build_rnn_cell(cell_type, activation, hidden_units_list, keep_prob_list, cel
         raise Exception('Only rnn, gru, lstm are supported as cell_type')
 
     return tf.nn.rnn_cell.MultiRNNCell(
-        cells = [ tf.nn.rnn_cell.DropoutWrapper(cell = cell_class(num_units = hidden_units_list[i], activation=activation),
-                                                output_keep_prob=keep_prob_list[i],
-                                                state_keep_prob=keep_prob_list[i]) for i in range(cell_size) ]
+        cells=[tf.nn.rnn_cell.DropoutWrapper(cell=cell_class(num_units=hidden_units_list[i], activation=activation),
+                                             output_keep_prob=keep_prob_list[i],
+                                             state_keep_prob=keep_prob_list[i]) for i in range(cell_size)]
     )
 
 
@@ -47,23 +47,23 @@ def cnn_layer(embedding, filter_list, kernel_size_list, activation, drop_out, is
         # batch * max_seq_len * filters
         output = tf.layers.conv1d(
             inputs=embedding,
-            filters= filter_list[i],
+            filters=filter_list[i],
             kernel_size=kernel_size_list[i],
-            padding='SAME', # for seq label task, max_seq_len can't change
+            padding='SAME',  # for seq label task, max_seq_len can't change
             activation=activation,
             name='cnn_kernel{}'.format(kernel_size_list[i])
         )
         add_layer_summary(output.name, output)
         output = tf.layers.dropout(output, rate=drop_out, seed=1234, training=is_training)
         outputs.append(output)
-    output = tf.concat(outputs, axis=-1) # batch_size * max_seq_len * sum(filter_list)
+    output = tf.concat(outputs, axis=-1)  # batch_size * max_seq_len * sum(filter_list)
     return output
 
 
 def pretrain_bert_embedding(input_ids, input_mask, segment_ids, pretrain_dir, drop_out, is_training):
     # use bert pretrain output from last stack
     # !!! Don't add additional variable_scope, will case bert checkpoint init failed
-    bert_config = modeling.BertConfig.from_json_file(os.path.join(pretrain_dir,'bert_config.json'))
+    bert_config = modeling.BertConfig.from_json_file(os.path.join(pretrain_dir, 'bert_config.json'))
 
     bert_model = modeling.BertModel(
         config=bert_config,
@@ -149,26 +149,21 @@ def crf_decode(logits, trans, seq_len, idx2tag, is_training, mask=None):
     return pred_ids
 
 
-
-
-
-
 if __name__ == '__main__':
-    batch_size =2
-    max_seq_len= 4
+    batch_size = 2
+    max_seq_len = 4
     label_size = 3
     mask = tf.constant([
-        [1.0,1.0,1.0,1.0],[1.0,1.0,1.0,1.0]
+        [1.0, 1.0, 1.0, 1.0], [1.0, 1.0, 1.0, 1.0]
     ])
     label_ids = tf.constant([
-      [1,1,2,0],[2,1,1,0]
+        [1, 1, 2, 0], [2, 1, 1, 0]
     ])
     probs = tf.constant(
-        [[[0.1,0.8,0.1],[0.2,0.6,0.2],[0.4,0.5,0.1], [0.4,0.3,0.3]],
-         [[0.2,0.7,0.1],[0.3,0.6,0.1],[0.2,0.5,0.3], [0.1,0.3,0.6]]
+        [[[0.1, 0.8, 0.1], [0.2, 0.6, 0.2], [0.4, 0.5, 0.1], [0.4, 0.3, 0.3]],
+         [[0.2, 0.7, 0.1], [0.3, 0.6, 0.1], [0.2, 0.5, 0.3], [0.1, 0.3, 0.6]]
          ]
     )
     i = 1
     input_prob = tf.gather(probs, tf.cast(i, tf.int32), axis=-1)  # single class probs: batch * max_seq
     input_label = tf.cast(tf.equal(label_ids, i), tf.float32)  # batch * max_seq
-

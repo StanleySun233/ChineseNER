@@ -7,6 +7,7 @@ from mrc.dataset import GeneratorDataset, Tag2Query
 import numpy as np
 import json
 
+
 class MRCDataset(GeneratorDataset):
     def __init__(self, data_dir, batch_size, max_seq_len):
         super(MRCDataset, self).__init__(data_dir, batch_size)
@@ -37,7 +38,7 @@ class MRCDataset(GeneratorDataset):
             'end_ids': tf.int32,
             'span_ids': tf.int32
         }
-        self.pads ={
+        self.pads = {
             'input_ids': self.tokenizer.convert_tokens_to_ids(['[PAD]'])[0],
             'segment_ids': 1,
             'query_len': 0,
@@ -68,15 +69,15 @@ class MRCDataset(GeneratorDataset):
         start_ids = [0] * seq_len
         end_ids = [0] * seq_len
         span_ids = np.zeros(shape=(seq_len, seq_len))
-        if not label_list :
+        if not label_list:
             return start_ids, end_ids, span_ids
 
         for label in label_list:
             if (label['tag'] == tag) and (label['end_pos'] < text_len):
-                #干掉被max_len截断的部分, 前面query_len的部分保持0
-                start_ids[label['start_pos']+query_len] = 1
-                end_ids[label['end_pos']+query_len] = 1
-                span_ids[label['start_pos']+query_len][label['end_pos']+query_len] = 1
+                # 干掉被max_len截断的部分, 前面query_len的部分保持0
+                start_ids[label['start_pos'] + query_len] = 1
+                end_ids[label['end_pos'] + query_len] = 1
+                span_ids[label['start_pos'] + query_len][label['end_pos'] + query_len] = 1
         return start_ids, end_ids, span_ids
 
     def build_single_feature(self, data):
@@ -93,8 +94,8 @@ class MRCDataset(GeneratorDataset):
             text = data['title'].split()
             text = text[: self.max_seq_len - query_len]
             text_len = len(text)
-            input = query+text
-            input_ids = self.tokenizer.convert_tokens_to_ids(input) # 这里直接对char进行convert了，会增加OOV但是会避免BPE分割问题
+            input = query + text
+            input_ids = self.tokenizer.convert_tokens_to_ids(input)  # 这里直接对char进行convert了，会增加OOV但是会避免BPE分割问题
             segment_ids = [0] * query_len + [1] * text_len
 
             start_ids, end_ids, span_ids = self.get_label(data['label'], tag, query_len, text_len)
@@ -106,7 +107,7 @@ class MRCDataset(GeneratorDataset):
                 'text_len': text_len,
                 'start_ids': start_ids,
                 'end_ids': end_ids,
-                'span_ids': span_ids.reshape(-1).tolist(), # flatten to dim1
+                'span_ids': span_ids.reshape(-1).tolist(),  # flatten to dim1
                 # for inference only field, not passed to model
                 'text': text,
                 'input': input,
@@ -124,7 +125,7 @@ class MRCDataset(GeneratorDataset):
         self.samples = samples
 
 
-def span_graph(features, labels,  params, is_training):
+def span_graph(features, labels, params, is_training):
     """
     pretrain Bert model output + CRF Layer
     """
@@ -133,7 +134,7 @@ def span_graph(features, labels,  params, is_training):
     query_len = features['query_len']
     text_len = features['text_len']
 
-    max_seq_len = tf.reduce_max(query_len+text_len)
+    max_seq_len = tf.reduce_max(query_len + text_len)
     input_mask = tf.sequence_mask(query_len + text_len, maxlen=max_seq_len)
 
     embedding = pretrain_bert_embedding(input_ids, input_mask, segment_ids, params['pretrain_dir'],
@@ -146,7 +147,7 @@ def span_graph(features, labels,  params, is_training):
         end_logits = tf.layers.dense(embedding, units=2, activation=None, use_bias=True, name='end_logits')
 
         start_probs = tf.nn.softmax(start_logits, axis=-1)
-        end_probs =tf.nn.softmax(end_logits, axis=-1)
+        end_probs = tf.nn.softmax(end_logits, axis=-1)
 
         add_layer_summary('start_probs', start_probs)
         add_layer_summary('end_probs', end_probs)
@@ -180,7 +181,8 @@ def span_graph(features, labels,  params, is_training):
         span_mask = tf.multiply(tf.tile(tf.expand_dims(text_mask, -1), [1, 1, max_seq_len]),
                                 tf.tile(tf.expand_dims(text_mask, -2), [1, max_seq_len, 1]))
         span_mask = tf.linalg.band_part(span_mask, 0, -1)  # 只保留下半矩阵，因为start <= end
-        tf.summary.image('span_mask',tf.expand_dims(tf.expand_dims(tf.cast(span_mask[0,:,:], tf.float32), axis=-1),0))
+        tf.summary.image('span_mask',
+                         tf.expand_dims(tf.expand_dims(tf.cast(span_mask[0, :, :], tf.float32), axis=-1), 0))
         tf.summary.scalar('span_mask', tf.reduce_sum(span_mask))
 
     if labels is None:
@@ -188,11 +190,12 @@ def span_graph(features, labels,  params, is_training):
 
     with tf.variable_scope('span_candidates'):
         # 因为Span Loss非常unbalance,所以在实现中只选取start/end的pred/label中为1的部分来计算span loss，其他部分都过滤掉
-        span_candidates = tf.logical_or(tf.tile(tf.expand_dims(start_probs > 0.5, -1), [1, 1, max_seq_len]) &\
+        span_candidates = tf.logical_or(tf.tile(tf.expand_dims(start_probs > 0.5, -1), [1, 1, max_seq_len]) & \
                                         tf.tile(tf.expand_dims(end_probs > 0.5, -2), [1, max_seq_len, 1]),
-                                        tf.tile(tf.expand_dims(labels['start_ids']>0, -1), [1, 1, max_seq_len]) & \
-                                        tf.tile(tf.expand_dims(labels['end_ids']>0, -2), [1, max_seq_len, 1]))
-        tf.summary.image('span_candidates', tf.expand_dims(tf.expand_dims(tf.cast(span_candidates[0, :, :], tf.float32), axis=-1), 0))
+                                        tf.tile(tf.expand_dims(labels['start_ids'] > 0, -1), [1, 1, max_seq_len]) & \
+                                        tf.tile(tf.expand_dims(labels['end_ids'] > 0, -2), [1, max_seq_len, 1]))
+        tf.summary.image('span_candidates',
+                         tf.expand_dims(tf.expand_dims(tf.cast(span_candidates[0, :, :], tf.float32), axis=-1), 0))
         span_mask_new = tf.multiply(span_mask, tf.cast(span_candidates, tf.float32))
         span_mask_new = tf.reshape(span_mask_new, [-1, tf.multiply(max_seq_len, max_seq_len)])
 
@@ -211,15 +214,15 @@ def span_graph(features, labels,  params, is_training):
     return loss, start_probs, end_probs, span_probs, text_mask, span_mask_new
 
 
-
 def span_model_fn():
     def model_fn(features, labels, mode, params):
         is_training = (mode == tf.estimator.ModeKeys.TRAIN)
-        loss, start_probs, end_probs, span_probs, text_mask, span_mask = span_graph(features, labels, params, is_training)
+        loss, start_probs, end_probs, span_probs, text_mask, span_mask = span_graph(features, labels, params,
+                                                                                    is_training)
 
         if is_training:
             train_op = bert_train_op(loss, params['lr'], params['num_train_steps'],
-                                    params['warmup_ratio'], params['diff_lr_times'], True)
+                                     params['warmup_ratio'], params['diff_lr_times'], True)
             spec = tf.estimator.EstimatorSpec(mode, loss=loss,
                                               train_op=train_op,
                                               training_hooks=[get_log_hook(loss, params['log_steps'])])
@@ -236,8 +239,8 @@ def span_model_fn():
                                                                  'span_mask': span_mask,
                                                                  'text_mask': text_mask})
         return spec
-    return model_fn
 
+    return model_fn
 
 
 def span_alignment(start_prob, end_prob):
@@ -249,7 +252,7 @@ def span_alignment(start_prob, end_prob):
     end_prob = end_prob > 0.5
 
     match_prob = np.tile(np.expand_dims(start_prob, 1), [1, seq_len]) & \
-                 np.tile(np.expand_dims(end_prob, 0), [seq_len,1])
+                 np.tile(np.expand_dims(end_prob, 0), [seq_len, 1])
 
     return match_prob
 
@@ -265,16 +268,16 @@ def entity_extract(prediction, token, tag):
 
     span_mask = np.multiply(np.tile(np.expand_dims(prediction['text_mask'], -2), [1, max_seq_len, 1]),
                             np.tile(np.expand_dims(prediction['text_mask'], -1), [1, 1, max_seq_len]))
-    span_mask = np.astype(np.linalg.band_part(span_mask, -1, 0) , bool) # 只保留下半矩阵，因为start < end
+    span_mask = np.astype(np.linalg.band_part(span_mask, -1, 0), bool)  # 只保留下半矩阵，因为start < end
 
     match_probs = span_alignment(prediction['start_preds'], prediction['end_preds'])
 
     match_probs = np.multiply(match_probs, span_mask)
 
-    pos = np.where(match_probs >0)
+    pos = np.where(match_probs > 0)
 
     entities = []
     for i in pos:
         entities.append(''.join(token[i[0]:i[1]]))
 
-    return {tag:entities}
+    return {tag: entities}

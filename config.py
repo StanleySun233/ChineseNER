@@ -6,14 +6,13 @@ TRAIN_PARAMS = {
     'dtype': tf.float32,
     'lr': 5e-6,
     'log_steps': 100,
-    'pretrain_dir': './pretrain_model/ch_google', # pretrain Bert-Model
+    'pretrain_dir': './pretrain_model/ch_google',  # pretrain Bert-Model
     'batch_size': 32,
     'epoch_size': 50,
     'embedding_dropout': 0.1,
     'warmup_ratio': 0.1,
-    'early_stop_ratio': 1 # stop after ratio * steps_per_epoch
+    'early_stop_ratio': 1  # stop after ratio * steps_per_epoch
 }
-
 
 RUN_CONFIG = {
     'summary_steps': 10,
@@ -28,3 +27,4 @@ RUN_CONFIG = {
     'intra_op_parallel': 2
 }
 
+PATH = 'D:\\data\\ChineseNER'

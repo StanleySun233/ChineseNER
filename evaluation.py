@@ -30,7 +30,8 @@ class SingleEval(object):
         with open('./data/{}/{}_predict.pkl'.format(self.data, self.model_name), 'rb') as f:
             prediction = pickle.load(f)
         with open('./data/{}/{}'.format(self.data,
-                                        '_'.join(filter(None, [self.prefix, self.surfix, 'data_params.pkl']))), 'rb') as f:
+                                        '_'.join(filter(None, [self.prefix, self.surfix, 'data_params.pkl']))),
+                  'rb') as f:
             data_params = pickle.load(f)
         self.idx2tag = data_params['idx2tag']
         self.prediction = [process_prediction(i, self.idx2tag) for i in prediction]
@@ -65,7 +66,7 @@ class SingleEval(object):
         if self.verbose:
             print('Data={} Model={} Evaluation {} total sample'.format(self.data,
                                                                        self.model_name,
-                                                                      len(self.prediction)))
+                                                                       len(self.prediction)))
         tag_report = self.tag_eval()
         entity_report = self.entity_eval()
         return tag_report, entity_report
@@ -86,10 +87,10 @@ class MultiEval(object):
         for model, se in zip(self.model_name_list, self.single_eval_list):
             tr, er = se.gen_report()
             self.metrics['tag'].update({
-                model:  tr['weighted avg']
+                model: tr['weighted avg']
             })
             self.metrics['entity'].update({
-                model:  er['weighted avg']
+                model: er['weighted avg']
             })
 
         self.pprint(self.metrics)
@@ -103,7 +104,7 @@ class MultiEval(object):
             'support': '{:.0f}'
         }
         for level in ['entity', 'tag']:
-            print('='*10+' {} level Evaluation '.format(level)+'='*10)
+            print('=' * 10 + ' {} level Evaluation '.format(level) + '=' * 10)
             df = pd.DataFrame(metrics[level]).transpose()
             df.sort_values(by='f1-score', ascending=False, inplace=True)
             for i in df.columns:
@@ -121,7 +122,7 @@ if __name__ == '__main__':
                         required=False, default=10)
     args = parser.parse_args()
     model_name_list = args.model_name.split(',')
-    if len(model_name_list) ==1:
+    if len(model_name_list) == 1:
         # If only 1 model is provided, Single Evaluate
         se = SingleEval(args.model_name, args.data)
         _ = se.gen_report()

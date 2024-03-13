@@ -56,10 +56,8 @@ if __name__ == '__main__':
     for tokenizer in Tokenizers:
         for word_enhance in [None] + WordEnhanceMethod:
             for file in MAPPING:
-                print('Dumping TF Record for {} word_enhance = {} tokenizer = {}'.\
+                print('Dumping TF Record for {} word_enhance = {} tokenizer = {}'. \
                       format(file, word_enhance, tokenizer))
                 prep = get_instance(tokenizer, MAX_SEQ_LEN, TAG2IDX, MAPPING, word_enhance)
                 prep.init_data(data_dir, file, load_data)
                 prep.dump_tfrecord()
-
-

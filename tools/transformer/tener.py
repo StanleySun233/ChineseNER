@@ -21,7 +21,7 @@ def relative_attention(key, query, num_head, d_model):
     with tf.variable_scope('tener_relative_attention'):
         max_seq_len = query.shape.as_list()[-2]
         pos_seq = np.array(range(-max_seq_len, max_seq_len))
-        pos_emb = sinusoidal_positional_encoding(d_model, pos_seq) # (2*max_seq_len) * d_model
+        pos_emb = sinusoidal_positional_encoding(d_model, pos_seq)  # (2*max_seq_len) * d_model
 
         u = tf.get_variable(shape=[num_head, d_model],
                             initializer=tf.contrib.layers.xavier_initializer(seed=1234),
@@ -32,17 +32,17 @@ def relative_attention(key, query, num_head, d_model):
 
         # Content Based Attention Score: QK (query&key semantic) + uK(key bias)
         rw_head_q = query + tf.expand_dims(u, axis=1)
-        AC = tf.einsum('bnqd,bnkd->bnqk', rw_head_q, key) # batch * num_head * query_len * key_len
+        AC = tf.einsum('bnqd,bnkd->bnqk', rw_head_q, key)  # batch * num_head * query_len * key_len
         add_layer_summary('content_base_att', AC)
 
         # positional Based Attention Score: QR(pos attented query) + vR(pos bias)
         rr_head_q = query + tf.expand_dims(v, axis=1)
-        BD = tf.einsum('bnqd,ld->bnql', rr_head_q, pos_emb) # batch * num_head * query_len * (2 * max_seq_len)
+        BD = tf.einsum('bnqd,ld->bnql', rr_head_q, pos_emb)  # batch * num_head * query_len * (2 * max_seq_len)
         BD = shift(BD)
         add_layer_summary('positinoal_base_att', BD)
 
-        #Att = QK + uK + QR + vR: batch * num_head * query_len * key_len ->(batch*num_head) * query_len * key_len
-        weight = AC+BD
+        # Att = QK + uK + QR + vR: batch * num_head * query_len * key_len ->(batch*num_head) * query_len * key_len
+        weight = AC + BD
         weight = tf.reshape(weight, [-1, max_seq_len, max_seq_len])
         add_layer_summary('att_premask', weight)
     return weight
@@ -65,10 +65,10 @@ def shift(BD):
     """
     _, num_head, query_len, pos_len = BD.shape.as_list()
     # 右边加入一列zero-pad: b * n * l* 2l-> b * n * l * (2l+1)
-    BD = tf.concat([BD, tf.zeros_like(BD[:,:,:,:1], dtype=tf.float32)], axis=-1)
-    #这一步reshape是精髓! b * n * l * (2l+1)->b * n * (2l) * l因为zero产生错位
-    BD = tf.reshape(BD, [-1, num_head, (pos_len+1), query_len])[:, :, :-1]
-    #reshape回原始size: b * n * l * 2l
+    BD = tf.concat([BD, tf.zeros_like(BD[:, :, :, :1], dtype=tf.float32)], axis=-1)
+    # 这一步reshape是精髓! b * n * l * (2l+1)->b * n * (2l) * l因为zero产生错位
+    BD = tf.reshape(BD, [-1, num_head, (pos_len + 1), query_len])[:, :, :-1]
+    # reshape回原始size: b * n * l * 2l
     BD = tf.reshape(BD, (-1, num_head, query_len, pos_len))
     BD = BD[:, :, :, query_len:]
     return BD
@@ -89,9 +89,9 @@ def relative_multi_head_attention(key, value, query, mask, num_head, dropout_rat
         weighted_val: batch_size * query_len * emb_size
     """
     with tf.variable_scope('multi_head_attention', reuse=tf.AUTO_REUSE):
-        d_model = value.shape.as_list()[-1] # emb_size
+        d_model = value.shape.as_list()[-1]  # emb_size
         # linear projection with dimension unchaangned
-        new_key = key # relative attention keeps key unchanged
+        new_key = key  # relative attention keeps key unchanged
         new_value = tf.layers.dense(value, units=d_model, activation=None, name='pre_value_project')
         new_query = tf.layers.dense(query, units=d_model, activation=None, name='pre_query_project')
 
@@ -103,7 +103,7 @@ def relative_multi_head_attention(key, value, query, mask, num_head, dropout_rat
         new_value = tf.concat(tf.split(new_value, num_or_size_splits=num_head, axis=-1), axis=0)
 
         # calculate relative attention
-        weight = relative_attention(new_key, new_query, num_head, int(d_model/num_head))
+        weight = relative_attention(new_key, new_query, num_head, int(d_model / num_head))
         weight = normalize_attention(weight, tf.tile(mask, [num_head, 1, 1]))
         # weighted value & concat num_head back
         # (batch_size * num_head) * query_len * (emb_size/num_head) -> batch_size * query_len * emb_size
@@ -119,7 +119,7 @@ def relative_multi_head_attention(key, value, query, mask, num_head, dropout_rat
     return weighted_val
 
 
-if __name__ =='__main__':
+if __name__ == '__main__':
     BD = tf.constant([[[[-3, -2, -1, 0, 1, 2],
                         [-3, -2, -1, 0, 1, 2],
                         [-3, -2, -1, 0, 1, 2]]]])

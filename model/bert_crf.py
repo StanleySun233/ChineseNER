@@ -5,7 +5,7 @@ from tools.utils import add_layer_summary
 from config import TRAIN_PARAMS
 
 
-def build_graph(features, labels,  params, is_training):
+def build_graph(features, labels, params, is_training):
     """
     pretrain Bert model output + CRF Layer
     """
@@ -29,5 +29,5 @@ def build_graph(features, labels,  params, is_training):
 
 
 TRAIN_PARAMS.update({
-    'diff_lr_times': {'crf': 500,  'logit': 500}
+    'diff_lr_times': {'crf': 500, 'logit': 500}
 })

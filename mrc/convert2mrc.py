@@ -29,7 +29,7 @@ def convert2mrc(sentence, tag_str):
     span = ''
     tag = ''
     for pos, (s, l) in enumerate(zip(sentence.split(), tag_str.split())):
-        if 'B-' in l :
+        if 'B-' in l:
             if span:
                 sample['label'].append({
                     'span': span,
@@ -40,7 +40,7 @@ def convert2mrc(sentence, tag_str):
             span = s
             start_pos = pos
             end_pos = pos
-            tag= l.split('-')[1]
+            tag = l.split('-')[1]
 
         elif 'I-' in l:
             end_pos = pos
@@ -54,7 +54,7 @@ def convert2mrc(sentence, tag_str):
                     'end_pos': end_pos,
                 })
                 span = ''
-                tag= ''
+                tag = ''
     if span:
         sample['label'].append({
             'span': span,
@@ -77,9 +77,9 @@ def run(data_name):
             sample = convert2mrc(sentence, tag)
             samples.append(sample)
 
-        with open(os.path.join(data_dir, module.MAPPING[file_name]+'_mrc.txt'), 'w') as f:
+        with open(os.path.join(data_dir, module.MAPPING[file_name] + '_mrc.txt'), 'w') as f:
             for i in samples:
-                f.write(json.dumps(i,ensure_ascii=False) + '\n')
+                f.write(json.dumps(i, ensure_ascii=False) + '\n')
 
 
 if __name__ == '__main__':

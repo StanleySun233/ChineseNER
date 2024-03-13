@@ -5,6 +5,7 @@ from data.base_preprocess import get_instance
 from data.people_daily.preprocess import load_data as pl_load_data, TAG2IDX, MAPPING, MAX_SEQ_LEN
 from data.tokenizer import Tokenizers
 
+
 def load_data(data_dir, file_name):
     """
     overwrite MSRA load data with train replacted by train_augment
@@ -12,7 +13,7 @@ def load_data(data_dir, file_name):
     The TFRecord will be stored in the new directory
     """
     data_dir = data_dir.replace('_augment', '')
-    if file_name=='train':
+    if file_name == 'train':
         with open(os.path.join(data_dir, 'train_augment.pkl'), 'rb') as f:
             sentences, tags = pickle.load(f)
     else:
@@ -26,7 +27,7 @@ if __name__ == '__main__':
     word_enhance = None
     for tokenizer in Tokenizers:
         for file in MAPPING:
-            print('Dumping TF Record for {} word_enhance = {} tokenizer = {}'.\
+            print('Dumping TF Record for {} word_enhance = {} tokenizer = {}'. \
                   format(file, word_enhance, tokenizer))
             prep = get_instance(tokenizer, MAX_SEQ_LEN, TAG2IDX, MAPPING, word_enhance)
             prep.init_data(data_dir, file, load_data)

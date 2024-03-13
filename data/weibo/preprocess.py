@@ -36,8 +36,8 @@ def load_data(data_dir, file_name):
     tag = []
     sentence = []
     with cs.open(
-    os.path.join(data_dir, 'weiboNER_2nd_conll.{}'.format(file_name)),
-    'r', encoding='utf-8') as f:
+            os.path.join(data_dir, 'weiboNER_2nd_conll.{}'.format(file_name)),
+            'r', encoding='utf-8') as f:
         tokens = f.readlines()
         for i in tokens:
             i = i.strip()

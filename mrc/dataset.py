@@ -21,12 +21,13 @@ Tag2Idx = {
     'I': 2
 }
 
-Idx2Tag = dict([(j,i) for i,j in Tag2Idx.items()
+Idx2Tag = dict([(j, i) for i, j in Tag2Idx.items()
                 ])
+
 
 class GeneratorDataset(object):
     def __init__(self, data_dir, batch_size):
-        self.data_dir  = data_dir
+        self.data_dir = data_dir
         self.batch_size = batch_size
         self.data_list = []
         self.samples = []
@@ -43,7 +44,7 @@ class GeneratorDataset(object):
 
     @property
     def steps_per_epoch(self):
-        return int(self.n_samples/self.batch_size)
+        return int(self.n_samples / self.batch_size)
 
     def load_data(self, file_name):
         # Data Loader for each task
@@ -62,7 +63,7 @@ class GeneratorDataset(object):
     def build_serving_proto(self):
         receiver_tensor = {}
         for i in self.feature_names:
-            receiver_tensor[i] = tf.placeholder(dtype=self.types[i], shape=[None]+self.shapes[i], name=i)
+            receiver_tensor[i] = tf.placeholder(dtype=self.types[i], shape=[None] + self.shapes[i], name=i)
         return tf.estimator.export.ServingInputReceiver(receiver_tensor, receiver_tensor)
 
     def build_input_fn(self, is_predict=False):
@@ -77,13 +78,14 @@ class GeneratorDataset(object):
             if not is_predict:
                 # here we repeat forever and use max_steps in TrainSpec to control n_epochs
                 dataset = dataset.shuffle(64). \
-                        padded_batch(self.batch_size, shapes, pads).\
-                        repeat()
+                    padded_batch(self.batch_size, shapes, pads). \
+                    repeat()
             else:
                 dataset = dataset.batch(1)
             dataset = dataset.prefetch(tf.data.experimental.AUTOTUNE)
 
             return dataset
+
         return helper
 
 
@@ -91,6 +93,7 @@ class MRCBIODataset(GeneratorDataset):
     """
     BIO Tagging Schema of MRC Model
     """
+
     def __init__(self, data_dir, batch_size, max_seq_len, tag2idx):
         super(MRCBIODataset, self).__init__(data_dir, batch_size)
         self.max_seq_len = max_seq_len
@@ -121,7 +124,7 @@ class MRCBIODataset(GeneratorDataset):
             'text_len': tf.int32,
             'label_ids': tf.int32
         }
-        self.pads ={
+        self.pads = {
             'input_ids': self.tokenizer.convert_tokens_to_ids(['[PAD]'])[0],
             'segment_ids': 1,
             'query_len': 0,
@@ -152,9 +155,14 @@ class MRCBIODataset(GeneratorDataset):
 
         for label in label_list:
             if (label['tag'] == tag) and (label['end_pos'] < text_len):
-                #干掉被max_len截断的部分, 前面query_len的部分保持0
-                label_ids[label['start_pos']+query_len] = self.tag2idx['B']
-                label_ids[(label['start_pos']+query_len+1):(label['end_pos']+query_len+1)] = [self.tag2idx['I']] * (label['end_pos']-label['start_pos'])
+                # 干掉被max_len截断的部分, 前面query_len的部分保持0
+                label_ids[label['start_pos'] + query_len] = self.tag2idx['B']
+                label_ids[(label['start_pos'] + query_len + 1):(label['end_pos'] + query_len + 1)] = [self.tag2idx[
+                                                                                                          'I']] * (
+                                                                                                                 label[
+                                                                                                                     'end_pos'] -
+                                                                                                                 label[
+                                                                                                                     'start_pos'])
         return label_ids
 
     def build_single_feature(self, data):
@@ -171,8 +179,8 @@ class MRCBIODataset(GeneratorDataset):
             text = data['title'].split()
             text = text[: self.max_seq_len - query_len]
             text_len = len(text)
-            input = query+text
-            input_ids = self.tokenizer.convert_tokens_to_ids(input) # 这里直接对char进行convert了，会增加OOV但是会避免BPE分割问题
+            input = query + text
+            input_ids = self.tokenizer.convert_tokens_to_ids(input)  # 这里直接对char进行convert了，会增加OOV但是会避免BPE分割问题
             segment_ids = [0] * query_len + [1] * text_len
 
             label_ids = self.get_label(data['label'], tag, query_len, text_len)
@@ -204,7 +212,7 @@ class MRCBIODataset(GeneratorDataset):
 
 
 if __name__ == '__main__':
-    pipe = MRCBIODataset(data_dir='./data/msra', batch_size=30, max_seq_len=150, tag2idx= Tag2Idx)
+    pipe = MRCBIODataset(data_dir='./data/msra', batch_size=30, max_seq_len=150, tag2idx=Tag2Idx)
     sess = tf.Session()
     pipe.build_feature('train')
     train_input = pipe.build_input_fn(False)

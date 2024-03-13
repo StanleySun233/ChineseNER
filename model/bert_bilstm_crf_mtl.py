@@ -29,8 +29,8 @@ def build_graph(features, labels, params, is_training):
     with tf.variable_scope(params['task_list'][0], reuse=tf.AUTO_REUSE):
         task_params = params[params['task_list'][0]]
         lstm_output1 = bilstm(embedding, params['cell_type'], params['rnn_activation'],
-                             params['hidden_units_list'], params['keep_prob_list'],
-                             params['cell_size'], seq_len, params['dtype'], is_training)
+                              params['hidden_units_list'], params['keep_prob_list'],
+                              params['cell_size'], seq_len, params['dtype'], is_training)
 
         logits = tf.layers.dense(lstm_output1, units=task_params['label_size'], activation=None,
                                  use_bias=True, name='logits')
@@ -45,8 +45,8 @@ def build_graph(features, labels, params, is_training):
     with tf.variable_scope(params['task_list'][1], reuse=tf.AUTO_REUSE):
         task_params = params[params['task_list'][1]]
         lstm_output2 = bilstm(embedding, params['cell_type'], params['rnn_activation'],
-                             params['hidden_units_list'], params['keep_prob_list'],
-                             params['cell_size'], seq_len, params['dtype'], is_training)
+                              params['hidden_units_list'], params['keep_prob_list'],
+                              params['cell_size'], seq_len, params['dtype'], is_training)
 
         if params['asymmetry']:
             # if asymmetry, task2 is the main task using task1 information
@@ -61,8 +61,8 @@ def build_graph(features, labels, params, is_training):
         loss2 = tf.reduce_sum(tf.boolean_mask(-loglikelihood2, mask2, axis=0)) * params['task_weight'][1]
         tf.summary.scalar('loss', loss2)
 
-    loss = (loss1+loss2)/tf.cast(batch_size, dtype=params['dtype'])
-    pred_ids = tf.where(tf.equal(task_ids, 0), pred_ids1, pred_ids2) # for infernce all pred_ids will be for 1 task
+    loss = (loss1 + loss2) / tf.cast(batch_size, dtype=params['dtype'])
+    pred_ids = tf.where(tf.equal(task_ids, 0), pred_ids1, pred_ids2)  # for infernce all pred_ids will be for 1 task
     return loss, pred_ids, task_ids
 
 
@@ -77,7 +77,7 @@ RNN_PARAMS = {
 
 TRAIN_PARAMS.update(RNN_PARAMS)
 TRAIN_PARAMS.update({
-    'diff_lr_times': {'crf': 500,  'logit': 500 , 'lstm': 100},
-    'task_weight': [1, 1], # equal weight for CWS+NER/NER+NER task，
-    'asymmetry': True # If asymmetry, task2 is the main task, using task1 hidden information
+    'diff_lr_times': {'crf': 500, 'logit': 500, 'lstm': 100},
+    'task_weight': [1, 1],  # equal weight for CWS+NER/NER+NER task，
+    'asymmetry': True  # If asymmetry, task2 is the main task, using task1 hidden information
 })

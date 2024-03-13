@@ -19,7 +19,7 @@ def clear_model(model_dir):
     except Exception as e:
         print('Error! {} occured at model cleaning'.format(e))
     else:
-        print( '{} model cleaned'.format(model_dir) )
+        print('{} model cleaned'.format(model_dir))
 
 
 def add_layer_summary(tag, value):
@@ -73,14 +73,14 @@ def get_log_hook(loss, save_steps):
 
 def get_pr_hook(logits, labels, output_dir, save_steps, prefix):
     # add precision-recall curve summary
-    pr_summary = tf.summary.pr_curve( name='{}_pr_curve'.format(prefix),
-                                      predictions=tf.sigmoid( logits ),
-                                      labels=tf.cast( labels, tf.bool ),
-                                      num_thresholds= 20 )
+    pr_summary = tf.summary.pr_curve(name='{}_pr_curve'.format(prefix),
+                                     predictions=tf.sigmoid(logits),
+                                     labels=tf.cast(labels, tf.bool),
+                                     num_thresholds=20)
 
     summary_hook = tf.train.SummarySaverHook(
-        save_steps= save_steps,
-        output_dir= output_dir,
+        save_steps=save_steps,
+        output_dir=output_dir,
         summary_op=[pr_summary]
     )
 

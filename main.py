@@ -7,7 +7,7 @@ import tensorflow as tf
 
 from config import RUN_CONFIG
 from dataset import NerDataset, MultiDataset
-from tools.train_utils import build_model_fn,build_mtl_model_fn
+from tools.train_utils import build_model_fn, build_mtl_model_fn
 from tools.utils import clear_model, build_estimator
 from tools.infer_utils import EXPORT_DIR, get_receiver
 
@@ -22,10 +22,10 @@ def singletask_train(args):
     # Init dataset and pass parameter to train_params
     TRAIN_PARAMS = getattr(importlib.import_module('model.{}'.format(args.model_name)), 'TRAIN_PARAMS')
     input_pipe = NerDataset(data_dir, TRAIN_PARAMS['batch_size'], TRAIN_PARAMS['epoch_size'], model_name)
-    TRAIN_PARAMS.update(input_pipe.params) # add label_size, max_seq_len, num_train_steps into train_params
-    print('='*10+'TRAIN PARAMS'+'='*10)
-    print(dict([(i,j )for i,j in TRAIN_PARAMS.items() if ('emb' not in i)  and ('vocab' not in i )]))
-    print('='*10+'RUN PARAMS'+'='*10)
+    TRAIN_PARAMS.update(input_pipe.params)  # add label_size, max_seq_len, num_train_steps into train_params
+    print('=' * 10 + 'TRAIN PARAMS' + '=' * 10)
+    print(dict([(i, j) for i, j in TRAIN_PARAMS.items() if ('emb' not in i) and ('vocab' not in i)]))
+    print('=' * 10 + 'RUN PARAMS' + '=' * 10)
     print(RUN_CONFIG)
 
     # Init estimator'
@@ -76,10 +76,10 @@ def multitask_train(args):
     # Init dataset and pass parameter to train_params
     TRAIN_PARAMS = getattr(importlib.import_module('model.{}'.format(args.model_name)), 'TRAIN_PARAMS')
     input_pipe = MultiDataset(data_dir, data_list, TRAIN_PARAMS['batch_size'], TRAIN_PARAMS['epoch_size'], model_name)
-    TRAIN_PARAMS.update(input_pipe.params) # add label_size, max_seq_len, num_train_steps into train_params
-    print('='*10+'TRAIN PARAMS'+'='*10)
+    TRAIN_PARAMS.update(input_pipe.params)  # add label_size, max_seq_len, num_train_steps into train_params
+    print('=' * 10 + 'TRAIN PARAMS' + '=' * 10)
     print(TRAIN_PARAMS)
-    print('='*10+'RUN PARAMS'+'='*10)
+    print('=' * 10 + 'RUN PARAMS' + '=' * 10)
     print(RUN_CONFIG)
 
     # Init estimator
@@ -136,10 +136,11 @@ if __name__ == '__main__':
     args = parser.parse_args()
 
     import os
-    os.environ["CUDA_VISIBLE_DEVICES"] = "{}".format(args.device)
-    os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3' # disable debugging logging
 
-    if len(args.data.split(','))>1:
+    os.environ["CUDA_VISIBLE_DEVICES"] = "{}".format(args.device)
+    os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # disable debugging logging
+
+    if len(args.data.split(',')) > 1:
         multitask_train(args)
     else:
         singletask_train(args)
