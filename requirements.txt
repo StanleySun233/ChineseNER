@@ -1,6 +1,9 @@
-# Python=3.8 with Tensorflow==1.15.0
+# available environment:
+# Python=3.8 Tensorflow==1.15.0 Windows10 Cuda 11.6
+# Python=3.7 Tensorflow==1.15.0 Ubuntu2004 Cuda 9.0
 tensorflow-gpu==1.15.0
 tensorflow-serving-api-gpu==1.15.0
+scipy==1.5.4
 bert-base==0.0.9
 gensim==3.8.3
 jieba
