@@ -4,11 +4,11 @@ import tensorflow as tf
 
 TRAIN_PARAMS = {
     'dtype': tf.float32,
-    'lr': 5e-6,
-    'log_steps': 100,
+    'lr': 5e-4,
+    'log_steps': 10,
     'pretrain_dir': './pretrain_model/ch_google',  # pretrain Bert-Model
-    'batch_size': 32,
-    'epoch_size': 50,
+    'batch_size': 64,
+    'epoch_size': 100,
     'embedding_dropout': 0.1,
     'warmup_ratio': 0.1,
     'early_stop_ratio': 1  # stop after ratio * steps_per_epoch

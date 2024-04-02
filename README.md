@@ -32,7 +32,7 @@ The code is not rigorously tested, if you find a bug, welcome PR ^_^ ~
     - 非Bert类模型，包括词汇增强模型用了Giga和ctb50的预训练词向量
 3. 运行单任务NER模型
 
-```python
+```shell
 python main.py --model bert_bilstm_crf --data msra
 tensorboard --logdir ./checkpoint/ner_msra_bert_bilstm_crf
 ```
@@ -40,7 +40,7 @@ tensorboard --logdir ./checkpoint/ner_msra_bert_bilstm_crf
 4. 运行多任务NER模型：按输入数据集类型可以是NER+NER的迁移/联合任务，也可以是NER+CWS的分词增强的NER任务。当前都是Joint
    Train暂不支持Alternative Train
 
-```python
+```shell
 ## data传入顺序对应task1, task2和task weight
 python main.py --model bert_bilstm_crf_mtl --data msra,people_daily 
 python main.py --model bert_bilstm_crf_adv --data msra,msr 
@@ -48,7 +48,7 @@ python main.py --model bert_bilstm_crf_adv --data msra,msr
 
 5. 评估：以上模型训练完会dump测试集的预测结果到data，repo里已经上传了现成的预测结果可用
 
-```python 
+```shell 
 ## 单模型：输出tag级别和entity级别详细结果
 python evaluation.py --model bert_bilstm_crf --data msra
 python evaluation.py --model bert_bilstm_crf_mtl_msra_msr --data msra ##注意多任务model_name=model_name_{task1}_{task2}
@@ -69,7 +69,7 @@ python evaluation.py --model bert_crf,bert_bilstm_crf,bert_bilstm_crf_mtl_msra_m
 2. 下载tf docker image
 
 ```bash
-docker pull tensorflow/serving_model:1.14.0
+docker pull tensorflow/serving:1.14.0-gpu
 ```
 
 3. warmup (optional), serving_model中提供的3个模型已经运行过warmup

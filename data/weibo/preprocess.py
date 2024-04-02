@@ -1,4 +1,5 @@
 # -*-coding:utf-8 -*-
+import config
 from data.base_preprocess import read_text
 import codecs as cs
 import os
@@ -56,6 +57,6 @@ def load_data(data_dir, file_name):
 
 
 if __name__ == '__main__':
-    data_dir = './data/weibo'
+    data_dir = config.PATH + '/data/weibo'
     file_name = 'dev'
     sentence_list, label_list = load_data(data_dir, file_name)

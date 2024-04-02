@@ -114,18 +114,21 @@ def get_eval_metrics(label_ids, pred_ids, idx2tag, task_name=''):
     pred_ids = tf.cast(pred_ids, tf.int32)
     if task_name:
         metric_op = {
-            'metric_{}/overall_accuracy'.format(task_name): tf.metrics.accuracy(labels=label_ids, predictions=pred_ids,
-                                                                                weights=mask)
+            'metric_{}/overall_accuracy'.format(task_name): tf.metrics.accuracy(labels=label_ids, predictions=pred_ids, weights=mask),
+            'metric_{}/overall_precision'.format(task_name): tf.metrics.precision(labels=label_ids, predictions=pred_ids, weights=mask),
+            'metric_{}/overall_recall'.format(task_name): tf.metrics.recall(labels=label_ids, predictions=pred_ids, weights=mask),
         }
     else:
         metric_op = {
-            'metric/overall_accuracy': tf.metrics.accuracy(labels=label_ids, predictions=pred_ids, weights=mask)
+            'metric/overall_accuracy': tf.metrics.accuracy(labels=label_ids, predictions=pred_ids, weights=mask),
+            'metric/overall_precision': tf.metrics.precision(labels=label_ids, predictions=pred_ids, weights=mask),
+            'metric/overall_recall': tf.metrics.recall(labels=label_ids, predictions=pred_ids, weights=mask),
         }
     # add accuracy metric per NER tag
     for id, tag in idx2tag.items():
         id = tf.cast(id, tf.int32)
         metric_op.update(calc_metrics(tf.equal(label_ids, id), tf.equal(pred_ids, id), mask, tag, task_name))
-
+    print(metric_op)
     return metric_op
 
 
@@ -142,6 +145,7 @@ def calc_metrics(label_ids, pred_ids, weight, prefix, task_name):
         'metric_{}/{}_recall'.format(task_name, prefix): (recall, recall_op),
         'metric_{}/{}_f1'.format(task_name, prefix): (f1, tf.identity(f1))
     }
+    print(metrics)
     return metrics
 
 

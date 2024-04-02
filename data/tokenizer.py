@@ -4,6 +4,7 @@ import importlib
 import os
 import numpy as np
 
+import config
 from tools.utils import normalize
 
 TokenizerBert = 'bert'
@@ -12,7 +13,7 @@ TokenizerLattice = 'lattice'
 Tokenizers = [TokenizerGiga, TokenizerBert]
 
 
-def get_bert_tokenizer(model_dir='./pretrain_model/ch_google/'):
+def get_bert_tokenizer(model_dir=config.PATH + '/pretrain_model/ch_google/'):
     """
     Bert tokenizer
     Either google_bert or wwm_bert worked, since they share the same word embedding
@@ -102,7 +103,7 @@ class TokenizerAdapter(object):
 
 
 if __name__ == '__main__':
-    token = get_giga_tokenizer()
+    token = get_lattice_tokenizer()
     s = '今天天气真好😔'
     # tokens = tokenizer.tokenize(s)
     # print(tokens )
