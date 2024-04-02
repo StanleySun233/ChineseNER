@@ -1,12 +1,14 @@
 # Python=3.7 with Tensorflow==1.15.0
 tensorflow-gpu==1.15.0
-# tensorflow-serving-api-gpu==1.15.0
+tensorflow-serving-api-gpu==1.15.0
+tensorboard==1.15.0
 scipy==1.5.4
 bert-base==0.0.9
 gensim==3.8.3
 jieba
 numpy==1.16.0
-protobuf==3.20.0
+# protobuf==3.20.0
+protobuf==3.19.6
 seqeval==1.2.2
 scikit-learn
 pandas

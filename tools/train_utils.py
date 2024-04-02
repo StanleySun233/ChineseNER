@@ -9,6 +9,7 @@ from itertools import chain
 from tools.utils import get_log_hook
 from collections import namedtuple
 from typing import List
+import tensorflow.metrics
 
 
 class AddonParser(object):

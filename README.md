@@ -33,8 +33,8 @@ The code is not rigorously tested, if you find a bug, welcome PR ^_^ ~
 3. 运行单任务NER模型
 
 ```shell
-python main.py --model bert_bilstm_crf --data msra
-tensorboard --logdir ./checkpoint/ner_msra_bert_bilstm_crf
+python main.py --model bilstm_crf --data maritime
+tensorboard --logdir ./checkpoint/ner_maritime_bilstm_crf
 ```
 
 4. 运行多任务NER模型：按输入数据集类型可以是NER+NER的迁移/联合任务，也可以是NER+CWS的分词增强的NER任务。当前都是Joint

@@ -118,6 +118,9 @@ def multitask_train(args):
 
 
 if __name__ == '__main__':
+    import tensorflow as tf
+
+    print(tf.test.is_gpu_available())  # 查看GPU设备
     parser = argparse.ArgumentParser()
     parser.add_argument('--model_name', type=str, help='model_name[bert_bilstm_crf, bert_crf, bert_ce]',
                         required=True)
@@ -128,7 +131,7 @@ if __name__ == '__main__':
     parser.add_argument('--gpu', type=int, help='Whether to enable gpu',
                         required=False, default=0)
     parser.add_argument('--device', type=int, help='which gpu to use',
-                        required=False, default=-1)
+                        required=False, default=0)
     parser.add_argument('--rename', type=str, help='Allow rename model with special parameter',
                         required=False, default='')
     parser.add_argument('--export_only', type=int, help='Export Model without training when ckpt exists',
@@ -138,7 +141,7 @@ if __name__ == '__main__':
     import os
 
     os.environ["CUDA_VISIBLE_DEVICES"] = "{}".format(args.device)
-    os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'  # disable debugging logging
+    os.environ['TF_CPP_MIN_LOG_LEVEL'] = '1'  # disable debugging logging
 
     if len(args.data.split(',')) > 1:
         multitask_train(args)
