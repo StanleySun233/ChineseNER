@@ -1,5 +1,3 @@
-import subprocess
-import os
 import config
 
 cmd = """docker run -it --rm -p %PORT%:8500 -v "{}/serving_model/%MODEL_NAME%:/models/%MODEL_NAME%" -e MODEL_NAME=%MODEL_NAME% tensorflow/serving:1.15.0-gpu
