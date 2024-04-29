@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>模型管理</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="#">菜单</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="/predict">命名实体识别</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/dataset">数据集管理</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/user">用户管理</a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link" href="/model">模型管理</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/color">颜色管理</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<div class="container mt-4">
+    <h2 class="text-center">模型管理</h2>
+    <form action="/add_model" method="POST" class="mt-4">
+        <div class="form-row">
+            <div class="col">
+                <input type="text" class="form-control" placeholder="名称" name="name" required>
+            </div>
+            <div class="col">
+                <input type="text" class="form-control" placeholder="数据集" name="dataset" required>
+            </div>
+            <div class="col">
+                <input type="number" class="form-control" placeholder="端口" name="port" required>
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-primary">添加模型</button>
+            </div>
+        </div>
+    </form>
+    <hr>
+    <h3 class="mt-4">数据集列表:</h3>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>名称</th>
+            <th class="text-center">数据集</th>
+            <th class="text-center">端口</th>
+            <th class="text-center">创建时间</th>
+            <th class="text-center">操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for model in models %}
+            <tr>
+                <td>{{ model.name }}</td>
+                <td class="text-center">{{ model.dataset }}</td>
+                <td class="text-center">{{ model.port }}</td>
+                <td class="text-center">{{ model.create_time }}</td>
+                <td class="text-center">
+                    <a href="/delete_model/{{ model.id }}" class="btn btn-danger btn-sm">删除</a>
+                    <a href="/update_model/{{ model.id }}" class="btn btn-primary btn-sm ml-2">更新</a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <hr>
+    <h3>模型搜索:</h3>
+    <form action="/search_model" method="POST">
+        <div class="form-group row">
+            <label for="column" class="col-sm-2 col-form-label">搜索关键词:</label>
+            <div class="col-sm-4">
+                <select class="form-control" id="column" name="column">
+                    <option value="name">名称</option>
+                    <option value="dataset">数据集</option>
+                    <option value="port">端口</option>
+                </select>
+            </div>
+            <div class="col-sm-4">
+                <input type="text" class="form-control" id="keyword" name="keyword" placeholder="关键词" required>
+            </div>
+            <div class="col-sm-2">
+                <button type="submit" class="btn btn-primary">搜索</button>
+            </div>
+        </div>
+    </form>
+</div>
+</body>
+</html>

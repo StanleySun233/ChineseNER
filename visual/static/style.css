@@ -1,0 +1,73 @@
+body {
+    font-family: Arial, sans-serif;
+    text-align: center; /* 让页面内容居中 */
+}
+
+#container {
+    margin: 0 auto; /* 让容器居中 */
+    width: 60%; /* 设置容器宽度 */
+    text-align: left; /* 内容左对齐 */
+}
+
+textarea {
+    width: 100%; /* 让文本框宽度充满容器 */
+    height: 200px; /* 设置文本框高度 */
+    margin-bottom: 10px;
+    padding: 8px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    resize: none; /* 禁止调整文本框大小 */
+}
+
+button {
+    padding: 10px 20px;
+    font-size: 16px;
+    cursor: pointer;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+.entity {
+    background-color: yellow;
+    cursor: pointer;
+    border-radius: 3px;
+    padding: 2px;
+    margin-right: 2px;
+}
+
+#outputText {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    padding: 10px;
+    margin-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+}
+
+#legend {
+    margin-top: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+}
+
+.legend-item {
+    margin-right: 20px;
+    margin-bottom: 10px;
+}
+
+.legend-item span {
+    display: inline-block;
+    width: 20px;
+    height: 20px;
+    margin-right: 5px;
+    border-radius: 3px;
+}

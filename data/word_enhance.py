@@ -155,6 +155,9 @@ def combine_soft_lexicon(idx_list):
     lexicon_dict = defaultdict(set)
     for lexicon in idx_list:
         for key in Soft2Idx:
+            if lexicon is None or key is None:
+                print(lexicon, key)
+                continue
             for i in lexicon[key]:
                 lexicon_dict[key].add(i)
 

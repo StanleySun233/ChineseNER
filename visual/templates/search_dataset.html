@@ -1,0 +1,78 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>搜索结果</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="#">菜单</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="/predict">命名实体识别</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/dataset">数据集管理</a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link" href="/user">用户管理</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/model">模型管理</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/color">颜色管理</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<div class="container mt-4">
+    <h2>搜索结果</h2>
+    <h3>搜索列: [{{ column }}]，搜索关键词：[{{ keyword }}]</h3>
+    <div class="table-responsive">
+        <table class="table" style="table-layout:fixed;word-break:break-all;word-wrap:break-word;">
+            <thead>
+            <tr>
+                <th class="text-center">名称</th>
+                <th class="text-center col-1">实体分类（中）</th>
+                <th class="text-center col-1">实体分类（英）</th>
+                <th class="text-center col-3">描述</th>
+                <th class="text-center">训练集路径</th>
+                <th class="text-center">测试集路径</th>
+                <th class="text-center">验证集路径</th>
+                <th class="text-center col-1">创建时间</th>
+                <th class="text-center col-2">删除/更新</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for dataset in datasets %}
+                <tr>
+                    <td class="text-center" style="word-wrap: break-word;">{{ dataset.name }}</td>
+                    <td class="text-center" style="word-wrap: break-word;">{{ dataset.label_list_cn }}</td>
+                    <td class="text-center" style="word-wrap: break-word;">{{ dataset.label_list_en }}</td>
+                    <td class="text-center" style="word-wrap: break-word;">{{ dataset.description }}</td>
+                    <td class="text-center" style="word-wrap: break-word;">{{ dataset.train_path }}</td>
+                    <td class="text-center" style="word-wrap: break-word;">{{ dataset.test_path }}</td>
+                    <td class="text-center" style="word-wrap: break-word;">{{ dataset.val_path }}</td>
+                    <td class="text-center" style="word-wrap: break-word;">{{ dataset.create_time }}</td>
+                    <td class="text-center">
+                        <a href="/delete_dataset/{{ dataset.id }}" class="btn btn-danger btn-sm">删除</a>
+                        <a href="/update_dataset/{{ dataset.id }}" class="btn btn-primary btn-sm ml-2">更新</a>
+                    </td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+</body>
+</html>

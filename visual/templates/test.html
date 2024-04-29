@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>命名实体识别</title>
+</head>
+<body>
+<h1>命名实体识别系统</h1>
+<label for="input_text">输入文本：</label>
+<textarea id="input_text" rows="4" cols="50"></textarea><br><br>
+
+<label for="select_model">选择模型：</label>
+<select id="select_model">
+    <!-- 从后端获取模型列表填充下拉框 -->
+</select>
+
+<label for="select_dataset">选择数据集：</label>
+<select id="select_dataset">
+    <!-- 从后端获取数据集列表填充下拉框 -->
+</select>
+
+<button onclick="predictEntities()">预测</button>
+
+<div id="result"></div>
+
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+<script>
+    function predictEntities() {
+        var text = $("#input_text").val();
+        var model = $("#select_model").val();
+        var dataset = $("#select_dataset").val();
+
+        $.ajax({
+            type: "POST",
+            url: "/predict",
+            contentType: "application/json",
+            data: JSON.stringify({text: text, model: model, dataset: dataset}),
+            success: function (response) {
+                displayResult(response.entities);
+            },
+            error: function (xhr, status, error) {
+                console.error("Error:", error);
+            }
+        });
+    }
+
+    function displayResult(entities) {
+        var resultDiv = $("#result");
+        resultDiv.empty();
+        if (entities.length === 0) {
+            resultDiv.text("未找到任何命名实体。");
+        } else {
+            var ul = $("<ul></ul>");
+            entities.forEach(function (entity) {
+                var li = $("<li></li>").text(entity.entity + " (" + entity.type + ") - 置信度: " + entity.confidence);
+                ul.append(li);
+            });
+            resultDiv.append(ul);
+        }
+    }
+</script>
+</body>
+</html>

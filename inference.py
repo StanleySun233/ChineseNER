@@ -10,24 +10,45 @@ from data.base_preprocess import get_instance, extract_prefix_surfix
 from data.tokenizer import TokenizerBert
 from tools.infer_utils import extract_entity, fix_tokens, timer, grpc_retry
 
-MODEL = 'bert_bilstm_crf_mtl'
+MODEL = 'bert_bilstm_crf_softlexicon_maritime'
 SERVER = 'localhost:8500'
 VERSION = 1
-MAX_SEQ_LEN = 150
 TIMEOUT = 10
+print('model', MODEL)
 
 TAG2IDX = {
     '[PAD]': 0,
     'O': 1,
-    'B-ORG': 2,
-    'I-ORG': 3,
-    'B-PER': 4,
-    'I-PER': 5,
-    'B-LOC': 6,
-    'I-LOC': 7,
-    '[CLS]': 8,
-    '[SEP]': 9
+    'B-CORP': 2,
+    'I-CORP': 3,
+    'B-CW': 4,
+    'I-CW': 5,
+    'B-GRP': 6,
+    'I-GRP': 7,
+    'B-LOC': 8,
+    'I-LOC': 9,
+    'B-PER': 10,
+    'I-PER': 11,
+    'B-PROD': 12,
+    'I-PROD': 13,
+    '[CLS]': 14,
+    '[SEP]': 15
 }
+
+MAX_SEQ_LEN = 32
+# MAX_SEQ_LEN = 150
+# TAG2IDX = {
+#     '[PAD]': 0,
+#     'O': 1,
+#     'B-ORG': 2,
+#     'I-ORG': 3,
+#     'B-PER': 4,
+#     'I-PER': 5,
+#     'B-LOC': 6,
+#     'I-LOC': 7,
+#     '[CLS]': 8,
+#     '[SEP]': 9
+# }
 
 
 class InferHelper(object):

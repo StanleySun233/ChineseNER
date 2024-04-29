@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <title>命名实体识别</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="/static/script.js"></script>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="#">菜单</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link active" href="/predict">命名实体识别</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/dataset">数据集管理</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/user">用户管理</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/model">模型管理</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/color">颜色管理</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<div id="container">
+    <h1 style="text-align: center;">命名实体识别</h1>
+    <h3 style="text-align: center;"> 识别文本 </h3>
+    <textarea id="inputText" rows="5" placeholder="在此处输入文本"></textarea><br>
+    <label for="model">选择模型：</label>
+    <select id="model">
+        <option value="" selected disabled>请选择模型</option>
+        <!-- 从后端获取模型列表填充下拉框 -->
+        {% for model in models %}
+            <option value="{{ model.name }}">{{ model.name }}</option>
+        {% endfor %}
+    </select>
+
+    <label for="dataset">选择数据集：</label>
+    <select id="dataset">
+        <option value="" selected disabled>请选择数据集</option>
+        <!-- 从后端获取数据集列表填充下拉框 -->
+        {% for dataset in datasets %}
+            <option value="{{ dataset.name }}">{{ dataset.name }}</option>
+        {% endfor %}
+    </select><br>
+    <button onclick="submitForm()">识别命名实体</button>
+    <br>
+    <h3 style="text-align: center;"> 识别结果 </h3>
+    <div id="outputText"></div>
+    <h3 style="text-align: center;"> 实体样例 </h3>
+    <div id="legend" style="text-align: center;">
+        {#        <div class="legend-item"><span style="background-color: lightblue;"></span> 人名 (PER)</div>#}
+        {#        <div class="legend-item"><span style="background-color: lightgreen;"></span> 地名 (LOC)</div>#}
+        {#        <div class="legend-item"><span style="background-color: lightpink;"></span> 公司名 (CORP)</div>#}
+        {#        <div class="legend-item"><span style="background-color: yellow;"></span> 产品名 (PROD)</div>#}
+        {#        <div class="legend-item"><span style="background-color: lightcoral;"></span> 组织名 (GRP)</div>#}
+        {#        <div class="legend-item"><span style="background-color: lightskyblue;"></span> 其他 (CW)</div>#}
+    </div>
+</div>
+<script>
+    // 监听数据集选择框的变化，动态更新颜色和标签
+    document.getElementById('dataset').addEventListener('change', function () {
+        var selectedDataset = this.value;
+        console.log(selectedDataset);
+        fetch('/get_entity_label_by_dataset_name/' + selectedDataset)
+            .then(response => response.json())
+            .then(data => {
+                document.getElementById('legend').innerHTML = '';
+
+                for (const [entity, label] of Object.entries(data)) {
+                    document.getElementById('legend').innerHTML += `<div class="legend-item"><span style="background-color: lightblue;" id=" ${label} (${entity})"></span> ${label} (${entity})</div>`;
+                }
+            });
+
+        fetch('/get_entity_color_by_dataset_name/' + selectedDataset)
+            .then(response => response.json())
+            .then(data => {
+                for (const [entity, color] of Object.entries(data)) {
+                    document.querySelector(`.legend-item span[style*="background-color: lightblue;"]`).style.backgroundColor = color;
+                }
+            });
+    });
+</script>
+</body>
+</html>

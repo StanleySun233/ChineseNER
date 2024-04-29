@@ -60,3 +60,5 @@ if __name__ == '__main__':
     data_dir = config.PATH + '/data/weibo'
     file_name = 'dev'
     sentence_list, label_list = load_data(data_dir, file_name)
+    print(sentence_list[:5])
+    print(label_list[:5])

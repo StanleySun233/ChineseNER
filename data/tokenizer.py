@@ -103,7 +103,7 @@ class TokenizerAdapter(object):
 
 
 if __name__ == '__main__':
-    token = get_lattice_tokenizer()
+    token = get_bert_tokenizer()
     s = '今天天气真好😔'
     # tokens = tokenizer.tokenize(s)
     # print(tokens )

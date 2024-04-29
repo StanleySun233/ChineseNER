@@ -33,8 +33,8 @@ The code is not rigorously tested, if you find a bug, welcome PR ^_^ ~
 3. 运行单任务NER模型
 
 ```shell
-python main.py --model bilstm_crf --data maritime
-tensorboard --logdir ./checkpoint/ner_maritime_bilstm_crf
+python main.py --model bert_bilstm_crf_softlexicon --data maritime
+tensorboard --logdir ./checkpoint/ner_maritime_bert_bilstm_crf_softlexicon
 ```
 
 4. 运行多任务NER模型：按输入数据集类型可以是NER+NER的迁移/联合任务，也可以是NER+CWS的分词增强的NER任务。当前都是Joint
@@ -94,19 +94,3 @@ python inference.py
 ![Infer with warmup](./serving_model/img.png)
 下图为加入warmup后的infer latency
 ![img_1.png](./serving_model/img_1.png)
-
-### 博客
-
-[中文NER的那些事儿1. Bert-Bilstm-CRF基线模型详解&代码实现](https://www.cnblogs.com/gogoSandy/p/14716671.html)
-
-[中文NER的那些事儿2. 多任务，对抗迁移学习详解&代码实现](https://www.cnblogs.com/gogoSandy/p/14773792.html)
-
-[中文NER的那些事儿3. SoftLexicon等词汇增强详解&代码实现 ](https://www.cnblogs.com/gogoSandy/p/14965711.html)
-
-[tensorflow踩坑合集2. TF Serving & gRPC 踩坑](https://www.cnblogs.com/gogoSandy/p/15106953.html)
-
-[中文NER的那些事儿4. 数据增强在NER的尝试](https://www.cnblogs.com/gogoSandy/p/15502087.html)
-
-[中文NER的那些事儿5. Transformer相对位置编码&TENER代码实现](https://www.cnblogs.com/gogoSandy/p/15565803.html)
-
-[中文NER的那些事儿6. NER新范式！你问我答之MRC](https://www.cnblogs.com/gogoSandy/p/15747756.html)

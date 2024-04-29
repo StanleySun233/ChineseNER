@@ -8,6 +8,8 @@ from itertools import chain
 from seqeval.metrics import classification_report as ner_cls_report
 from sklearn.metrics import classification_report as tag_cls_report
 from collections import defaultdict
+
+import config
 from tools.predict_utils import process_prediction
 
 from data.base_preprocess import extract_prefix_surfix
@@ -27,9 +29,9 @@ class SingleEval(object):
         self.init()
 
     def init(self):
-        with open('./data/{}/{}_predict.pkl'.format(self.data, self.model_name), 'rb') as f:
+        with open(config.PATH + '/data/{}/{}_predict.pkl'.format(self.data, self.model_name), 'rb') as f:
             prediction = pickle.load(f)
-        with open('./data/{}/{}'.format(self.data,
+        with open(config.PATH + '/data/{}/{}'.format(self.data,
                                         '_'.join(filter(None, [self.prefix, self.surfix, 'data_params.pkl']))),
                   'rb') as f:
             data_params = pickle.load(f)

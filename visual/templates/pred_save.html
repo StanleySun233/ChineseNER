@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>命名实体识别</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center; /* 让页面内容居中 */
+        }
+
+        #container {
+            margin: 0 auto; /* 让容器居中 */
+            width: 60%; /* 设置容器宽度 */
+            text-align: left; /* 内容左对齐 */
+        }
+
+        textarea {
+            width: 100%; /* 让文本框宽度充满容器 */
+            height: 200px; /* 设置文本框高度 */
+            margin-bottom: 10px;
+            padding: 8px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            resize: none; /* 禁止调整文本框大小 */
+        }
+
+        button {
+            padding: 10px 20px;
+            font-size: 16px;
+            cursor: pointer;
+            background-color: #007bff;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        .entity {
+            background-color: yellow;
+            cursor: pointer;
+            border-radius: 3px;
+            padding: 2px;
+            margin-right: 2px;
+        }
+
+        #outputText {
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            padding: 10px;
+            margin-top: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-start;
+        }
+
+        #legend {
+            margin-top: 20px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: flex-start;
+        }
+
+        .legend-item {
+            margin-right: 20px;
+            margin-bottom: 10px;
+        }
+
+        .legend-item span {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            margin-right: 5px;
+            border-radius: 3px;
+        }
+    </style>
+    <script>
+        // 使用 JavaScript 处理表单提交和实体标记
+        function highlightEntities(entities) {
+            var text = document.getElementById('inputText').value;
+            entities.forEach(function (entity) {
+                var re = new RegExp(entity.entity, 'g');
+                var type = entity.type;
+                var confidence = entity.confidence;
+                var color = getColorForType(type);
+                text = text.replace(re, '<span class="entity" style="background-color:' + color + ';" title="Type: ' + type + ', Confidence: ' + confidence.toFixed(2) + '">' + entity.entity + '</span>');
+            });
+            document.getElementById('outputText').innerHTML = text;
+        }
+
+        // 根据实体类型返回颜色
+        function getColorForType(type) {
+            switch (type) {
+                case 'PER':
+                    return 'lightblue';
+                case 'LOC':
+                    return 'lightgreen';
+                case 'CORP':
+                    return 'lightpink';
+                case 'PROD':
+                    return 'yellow';
+                case 'GRP':
+                    return 'lightcoral';
+                case 'CW':
+                    return 'lightskyblue';
+                default:
+                    return 'lightgray';
+            }
+        }
+
+        // 处理表单提交
+        function submitForm() {
+            var text = document.getElementById('inputText').value;
+            fetch('/predict', {
+                method: 'POST',
+                body: new URLSearchParams({
+                    'text': text
+                }),
+                headers: {
+                    'Content-Type': 'application/x-www-form-urlencoded'
+                }
+            })
+                .then(response => response.json())
+                .then(data => highlightEntities(data))
+                .catch(error => console.error('Error:', error));
+        }
+    </script>
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="#">菜单</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link active" href="/predict">命名实体识别</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/dataset">数据集管理</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/user">用户管理</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/model">模型管理</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/color">颜色管理</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<div id="container">
+    <h1 style="text-align: center;">命名实体识别</h1>
+    <textarea id="inputText" rows="5" placeholder="在此处输入文本"></textarea><br>
+    <button onclick="submitForm()">识别命名实体</button>
+    <br>
+    <div id="outputText"></div>
+    <div id="legend">
+        <div class="legend-item"><span style="background-color: lightblue;"></span> 人名 (PER)</div>
+        <div class="legend-item"><span style="background-color: lightgreen;"></span> 地名 (LOC)</div>
+        <div class="legend-item"><span style="background-color: lightpink;"></span> 公司名 (CORP)</div>
+        <div class="legend-item"><span style="background-color: yellow;"></span> 产品名 (PROD)</div>
+        <div class="legend-item"><span style="background-color: lightcoral;"></span> 组织名 (GRP)</div>
+        <div class="legend-item"><span style="background-color: lightskyblue;"></span> 其他 (CW)</div>
+    </div>
+</div>
+</body>
+</html>

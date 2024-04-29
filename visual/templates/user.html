@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>用户管理</title>
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
+</head>
+<body>
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="#">菜单</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <a class="nav-link" href="/predict">命名实体识别</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/dataset">数据集管理</a>
+                </li>
+                <li class="nav-item active">
+                    <a class="nav-link" href="/user">用户管理</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/model">模型管理</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="/color">颜色管理</a>
+                </li>
+            </ul>
+        </div>
+    </div>
+</nav>
+<div class="container mt-4">
+    <h2 class="text-center">用户管理</h2>
+    <form action="/add_user" method="POST" class="mt-4">
+        <div class="form-row">
+            <div class="col">
+                <input type="text" class="form-control" placeholder="账号" name="account" required>
+            </div>
+            <div class="col">
+                <input type="password" class="form-control" placeholder="密码" name="password" required>
+            </div>
+            <div class="col-auto">
+                <button type="submit" class="btn btn-primary">添加用户</button>
+            </div>
+        </div>
+    </form>
+    <hr>
+    <h3 class="mt-4">账号列表:</h3>
+    <table class="table">
+        <thead>
+        <tr>
+            <th>账号</th>
+            <th class="text-center">密码</th>
+            <th class="text-center">创建时间</th>
+            <th class="text-center">操作</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for user in users %}
+            <tr>
+                <td>{{ user.account }}</td>
+                <td class="text-center">{{ user.password }}</td>
+                <td class="text-center">{{ user.create_time }}</td>
+                <td class="text-center">
+                    <a href="/delete_user/{{ user.id }}" class="btn btn-danger btn-sm">删除</a>
+                    <a href="/update_user/{{ user.id }}" class="btn btn-primary btn-sm ml-2">更新</a>
+                </td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+    <hr>
+    <h3>用户搜索:</h3>
+    <form action="/search_user" method="POST">
+        <div class="form-group row">
+            <label for="column" class="col-sm-2 col-form-label">搜索关键词:</label>
+            <div class="col-sm-4">
+                <select class="form-control" id="column" name="column">
+                    <option value="account">账号</option>
+                </select>
+            </div>
+            <div class="col-sm-4">
+                <input type="text" class="form-control" id="keyword" name="keyword" placeholder="关键词" required>
+            </div>
+            <div class="col-sm-2">
+                <button type="submit" class="btn btn-primary">搜索</button>
+            </div>
+        </div>
+    </form>
+</div>
+</body>
+</html>

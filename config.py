@@ -7,8 +7,8 @@ TRAIN_PARAMS = {
     'lr': 5e-4,
     'log_steps': 10,
     'pretrain_dir': './pretrain_model/ch_google',  # pretrain Bert-Model
-    'batch_size': 64,
-    'epoch_size': 100,
+    'batch_size': 8,
+    'epoch_size': 5,
     'embedding_dropout': 0.1,
     'warmup_ratio': 0.1,
     'early_stop_ratio': 1  # stop after ratio * steps_per_epoch
@@ -16,7 +16,7 @@ TRAIN_PARAMS = {
 
 RUN_CONFIG = {
     'summary_steps': 10,
-    'log_steps': 100,
+    'log_steps': 10,
     'save_steps': 500,
     'keep_checkpoint_max': 3,
     'allow_growth': True,
@@ -28,3 +28,6 @@ RUN_CONFIG = {
 }
 
 PATH = 'D:/data/ChineseNER'
+
+model_api = {"bilstm_crf_softlexicon_msra": "8500",
+             "bert_bilstm_crf_softlexicon_maritime": "8400"}
