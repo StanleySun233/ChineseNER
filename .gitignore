@@ -9,3 +9,8 @@ pretrain_model/*/*.vec
 */__pycache__/*
 */*/__pycache__/*
 __pycache__/
+*.pkl
+*.index
+*.meta
+*.pbtxt
+checkpoint

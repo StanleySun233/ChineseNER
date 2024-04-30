@@ -409,4 +409,4 @@ if __name__ == '__main__':
     with app.app_context():
         db.create_all()
         print("http://127.0.0.1:5000/login")
-        app.run(debug=True)
+        app.run(debug=False)
