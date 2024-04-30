@@ -54,7 +54,7 @@
         </div>
     </form>
     <hr>
-    <h3 class="mt-4">数据集列表:</h3>
+    <h3 class="mt-4">模型列表:</h3>
     <table class="table">
         <thead>
         <tr>
@@ -67,16 +67,16 @@
         </thead>
         <tbody>
         {% for model in models %}
-            <tr>
-                <td>{{ model.name }}</td>
-                <td class="text-center">{{ model.dataset }}</td>
-                <td class="text-center">{{ model.port }}</td>
-                <td class="text-center">{{ model.create_time }}</td>
-                <td class="text-center">
-                    <a href="/delete_model/{{ model.id }}" class="btn btn-danger btn-sm">删除</a>
-                    <a href="/update_model/{{ model.id }}" class="btn btn-primary btn-sm ml-2">更新</a>
-                </td>
-            </tr>
+        <tr>
+            <td>{{ model.name }}</td>
+            <td class="text-center">{{ model.dataset }}</td>
+            <td class="text-center">{{ model.port }}</td>
+            <td class="text-center">{{ model.create_time }}</td>
+            <td class="text-center">
+                <a href="/delete_model/{{ model.id }}" class="btn btn-danger btn-sm">删除</a>
+                <a href="/update_model/{{ model.id }}" class="btn btn-primary btn-sm ml-2">更新</a>
+            </td>
+        </tr>
         {% endfor %}
         </tbody>
     </table>

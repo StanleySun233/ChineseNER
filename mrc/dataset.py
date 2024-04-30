@@ -159,10 +159,10 @@ class MRCBIODataset(GeneratorDataset):
                 label_ids[label['start_pos'] + query_len] = self.tag2idx['B']
                 label_ids[(label['start_pos'] + query_len + 1):(label['end_pos'] + query_len + 1)] = [self.tag2idx[
                                                                                                           'I']] * (
-                                                                                                                 label[
-                                                                                                                     'end_pos'] -
-                                                                                                                 label[
-                                                                                                                     'start_pos'])
+                                                                                                             label[
+                                                                                                                 'end_pos'] -
+                                                                                                             label[
+                                                                                                                 'start_pos'])
         return label_ids
 
     def build_single_feature(self, data):

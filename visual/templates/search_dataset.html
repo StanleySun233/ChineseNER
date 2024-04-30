@@ -55,20 +55,20 @@
             </thead>
             <tbody>
             {% for dataset in datasets %}
-                <tr>
-                    <td class="text-center" style="word-wrap: break-word;">{{ dataset.name }}</td>
-                    <td class="text-center" style="word-wrap: break-word;">{{ dataset.label_list_cn }}</td>
-                    <td class="text-center" style="word-wrap: break-word;">{{ dataset.label_list_en }}</td>
-                    <td class="text-center" style="word-wrap: break-word;">{{ dataset.description }}</td>
-                    <td class="text-center" style="word-wrap: break-word;">{{ dataset.train_path }}</td>
-                    <td class="text-center" style="word-wrap: break-word;">{{ dataset.test_path }}</td>
-                    <td class="text-center" style="word-wrap: break-word;">{{ dataset.val_path }}</td>
-                    <td class="text-center" style="word-wrap: break-word;">{{ dataset.create_time }}</td>
-                    <td class="text-center">
-                        <a href="/delete_dataset/{{ dataset.id }}" class="btn btn-danger btn-sm">删除</a>
-                        <a href="/update_dataset/{{ dataset.id }}" class="btn btn-primary btn-sm ml-2">更新</a>
-                    </td>
-                </tr>
+            <tr>
+                <td class="text-center" style="word-wrap: break-word;">{{ dataset.name }}</td>
+                <td class="text-center" style="word-wrap: break-word;">{{ dataset.label_list_cn }}</td>
+                <td class="text-center" style="word-wrap: break-word;">{{ dataset.label_list_en }}</td>
+                <td class="text-center" style="word-wrap: break-word;">{{ dataset.description }}</td>
+                <td class="text-center" style="word-wrap: break-word;">{{ dataset.train_path }}</td>
+                <td class="text-center" style="word-wrap: break-word;">{{ dataset.test_path }}</td>
+                <td class="text-center" style="word-wrap: break-word;">{{ dataset.val_path }}</td>
+                <td class="text-center" style="word-wrap: break-word;">{{ dataset.create_time }}</td>
+                <td class="text-center">
+                    <a href="/delete_dataset/{{ dataset.id }}" class="btn btn-danger btn-sm">删除</a>
+                    <a href="/update_dataset/{{ dataset.id }}" class="btn btn-primary btn-sm ml-2">更新</a>
+                </td>
+            </tr>
             {% endfor %}
             </tbody>
         </table>

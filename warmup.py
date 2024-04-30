@@ -16,7 +16,8 @@ def main():
 
     os.mkdir(config.PATH + '/serving_model/{}/{}/assets.extra'.format(MODEL, VERSION))
     with tf.io.TFRecordWriter(
-            config.PATH +  "/serving_model/{}/{}/assets.extra/tf_serving_warmup_requests".format(MODEL, VERSION)) as writer:
+            config.PATH + "/serving_model/{}/{}/assets.extra/tf_serving_warmup_requests".format(MODEL,
+                                                                                                VERSION)) as writer:
         feature = infer_handle.make_feature(warmup_text)
         req = infer_handle.make_request(feature)
         log = prediction_log_pb2.PredictionLog(

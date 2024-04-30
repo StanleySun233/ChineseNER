@@ -32,7 +32,8 @@ class SingleEval(object):
         with open(config.PATH + '/data/{}/{}_predict.pkl'.format(self.data, self.model_name), 'rb') as f:
             prediction = pickle.load(f)
         with open(config.PATH + '/data/{}/{}'.format(self.data,
-                                        '_'.join(filter(None, [self.prefix, self.surfix, 'data_params.pkl']))),
+                                                     '_'.join(
+                                                         filter(None, [self.prefix, self.surfix, 'data_params.pkl']))),
                   'rb') as f:
             data_params = pickle.load(f)
         self.idx2tag = data_params['idx2tag']

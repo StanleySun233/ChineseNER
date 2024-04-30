@@ -52,18 +52,18 @@
         </thead>
         <tbody>
         {% for color in colors %}
-            <tr>
-                <td>{{ color.name }}</td>
-                <td>{{ color.html_color }}</td>
-                <td>{{ color.R }}</td>
-                <td>{{ color.G }}</td>
-                <td>{{ color.B }}</td>
-                <td>{{ color.create_time }}</td>
-                <td>
-                    <a href="/delete_color/{{ color.id }}" class="btn btn-danger btn-sm">删除</a>
-                    <a href="/update_color/{{ color.id }}" class="btn btn-primary btn-sm ml-2">更新</a>
-                </td>
-            </tr>
+        <tr>
+            <td>{{ color.name }}</td>
+            <td>{{ color.html_color }}</td>
+            <td>{{ color.R }}</td>
+            <td>{{ color.G }}</td>
+            <td>{{ color.B }}</td>
+            <td>{{ color.create_time }}</td>
+            <td>
+                <a href="/delete_color/{{ color.id }}" class="btn btn-danger btn-sm">删除</a>
+                <a href="/update_color/{{ color.id }}" class="btn btn-primary btn-sm ml-2">更新</a>
+            </td>
+        </tr>
         {% endfor %}
         </tbody>
     </table>

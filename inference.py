@@ -36,6 +36,8 @@ TAG2IDX = {
 }
 
 MAX_SEQ_LEN = 32
+
+
 # MAX_SEQ_LEN = 150
 # TAG2IDX = {
 #     '[PAD]': 0,

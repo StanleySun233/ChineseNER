@@ -7,30 +7,30 @@
     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css">
 </head>
 <body>
-    <div class="container mt-4">
-        <h2>Search Result</h2>
-        <h3>Column: {{ column }}</h3>
-        <table class="table mt-3">
-            <thead>
-                <tr>
-                    <th>Name</th>
-                    <th>Score</th>
-                    <th>Actions</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for student in students %}
-                <tr>
-                    <td>{{ student.name }}</td>
-                    <td>{{ student.score }}</td>
-                    <td>
-                        <a href="/delete/{{ student.id }}" class="btn btn-danger btn-sm">Delete</a>
-                        <a href="/update/{{ student.id }}" class="btn btn-primary btn-sm ml-2">Update</a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
+<div class="container mt-4">
+    <h2>Search Result</h2>
+    <h3>Column: {{ column }}</h3>
+    <table class="table mt-3">
+        <thead>
+        <tr>
+            <th>Name</th>
+            <th>Score</th>
+            <th>Actions</th>
+        </tr>
+        </thead>
+        <tbody>
+        {% for student in students %}
+        <tr>
+            <td>{{ student.name }}</td>
+            <td>{{ student.score }}</td>
+            <td>
+                <a href="/delete/{{ student.id }}" class="btn btn-danger btn-sm">Delete</a>
+                <a href="/update/{{ student.id }}" class="btn btn-primary btn-sm ml-2">Update</a>
+            </td>
+        </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+</div>
 </body>
 </html>

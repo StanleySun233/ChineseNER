@@ -46,7 +46,7 @@
         <option value="" selected disabled>请选择模型</option>
         <!-- 从后端获取模型列表填充下拉框 -->
         {% for model in models %}
-            <option value="{{ model.name }}">{{ model.name }}</option>
+        <option value="{{ model.name }}">{{ model.name }}</option>
         {% endfor %}
     </select>
 
@@ -55,7 +55,7 @@
         <option value="" selected disabled>请选择数据集</option>
         <!-- 从后端获取数据集列表填充下拉框 -->
         {% for dataset in datasets %}
-            <option value="{{ dataset.name }}">{{ dataset.name }}</option>
+        <option value="{{ dataset.name }}">{{ dataset.name }}</option>
         {% endfor %}
     </select><br>
     <button onclick="submitForm()">识别命名实体</button>
@@ -64,12 +64,24 @@
     <div id="outputText"></div>
     <h3 style="text-align: center;"> 实体样例 </h3>
     <div id="legend" style="text-align: center;">
-        {#        <div class="legend-item"><span style="background-color: lightblue;"></span> 人名 (PER)</div>#}
-        {#        <div class="legend-item"><span style="background-color: lightgreen;"></span> 地名 (LOC)</div>#}
-        {#        <div class="legend-item"><span style="background-color: lightpink;"></span> 公司名 (CORP)</div>#}
-        {#        <div class="legend-item"><span style="background-color: yellow;"></span> 产品名 (PROD)</div>#}
-        {#        <div class="legend-item"><span style="background-color: lightcoral;"></span> 组织名 (GRP)</div>#}
-        {#        <div class="legend-item"><span style="background-color: lightskyblue;"></span> 其他 (CW)</div>#}
+        {#
+        <div class="legend-item"><span style="background-color: lightblue;"></span> 人名 (PER)</div>
+        #}
+        {#
+        <div class="legend-item"><span style="background-color: lightgreen;"></span> 地名 (LOC)</div>
+        #}
+        {#
+        <div class="legend-item"><span style="background-color: lightpink;"></span> 公司名 (CORP)</div>
+        #}
+        {#
+        <div class="legend-item"><span style="background-color: yellow;"></span> 产品名 (PROD)</div>
+        #}
+        {#
+        <div class="legend-item"><span style="background-color: lightcoral;"></span> 组织名 (GRP)</div>
+        #}
+        {#
+        <div class="legend-item"><span style="background-color: lightskyblue;"></span> 其他 (CW)</div>
+        #}
     </div>
 </div>
 <script>

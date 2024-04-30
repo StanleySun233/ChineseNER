@@ -28,7 +28,7 @@
                 <li class="nav-item active">
                     <a class="nav-link" href="/model">模型管理</a>
                 </li>
-                                <li class="nav-item">
+                <li class="nav-item">
                     <a class="nav-link" href="/color">颜色管理</a>
                 </li>
             </ul>
@@ -50,16 +50,16 @@
         </thead>
         <tbody>
         {% for model in models %}
-            <tr>
-                <td>{{ model.name }}</td>
-                <td class="text-center">{{ model.dataset }}</td>
-                <td class="text-center">{{ model.port }}</td>
-                <td class="text-center">{{ model.create_time }}</td>
-                <td class="text-center">
-                    <a href="/delete_model/{{ model.id }}" class="btn btn-danger btn-sm">删除</a>
-                    <a href="/update_model/{{ model.id }}" class="btn btn-primary btn-sm ml-2">更新</a>
-                </td>
-            </tr>
+        <tr>
+            <td>{{ model.name }}</td>
+            <td class="text-center">{{ model.dataset }}</td>
+            <td class="text-center">{{ model.port }}</td>
+            <td class="text-center">{{ model.create_time }}</td>
+            <td class="text-center">
+                <a href="/delete_model/{{ model.id }}" class="btn btn-danger btn-sm">删除</a>
+                <a href="/update_model/{{ model.id }}" class="btn btn-primary btn-sm ml-2">更新</a>
+            </td>
+        </tr>
         {% endfor %}
         </tbody>
     </table>

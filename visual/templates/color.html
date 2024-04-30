@@ -76,19 +76,24 @@
         </thead>
         <tbody>
         {% for color in colors %}
-            <tr>
-                <td>{{ color.name }}</td>
-                <td class="text-left"><div class="legend-item"><span style="background-color: rgb({{ color.R }}, {{ color.G }}, {{ color.B }});"></span>{{ color.html_color }} </div></td>
+        <tr>
+            <td>{{ color.name }}</td>
+            <td class="text-left">
+                <div class="legend-item"><span
+                        style="background-color: rgb({{ color.R }}, {{ color.G }}, {{ color.B }});"></span>{{
+                    color.html_color }}
+                </div>
+            </td>
 
-                <td>{{ color.R }}</td>
-                <td>{{ color.G }}</td>
-                <td>{{ color.B }}</td>
-                <td>{{ color.create_time }}</td>
-                <td>
-                    <a href="/delete_color/{{ color.id }}" class="btn btn-danger btn-sm">删除</a>
-                    <a href="/update_color/{{ color.id }}" class="btn btn-primary btn-sm ml-2">更新</a>
-                </td>
-            </tr>
+            <td>{{ color.R }}</td>
+            <td>{{ color.G }}</td>
+            <td>{{ color.B }}</td>
+            <td>{{ color.create_time }}</td>
+            <td>
+                <a href="/delete_color/{{ color.id }}" class="btn btn-danger btn-sm">删除</a>
+                <a href="/update_color/{{ color.id }}" class="btn btn-primary btn-sm ml-2">更新</a>
+            </td>
+        </tr>
         {% endfor %}
         </tbody>
     </table>
@@ -124,7 +129,7 @@
     var inputB = document.querySelector('input[name="B"]');
 
     // 监听颜色选择器变化事件
-    colorPicker.addEventListener('input', function() {
+    colorPicker.addEventListener('input', function () {
         // 获取选择的颜色值
         var selectedColor = colorPicker.value;
         // 将颜色值转换为RGB值
@@ -141,7 +146,7 @@
         var r = (bigint >> 16) & 255;
         var g = (bigint >> 8) & 255;
         var b = bigint & 255;
-        return { r: r, g: g, b: b };
+        return {r: r, g: g, b: b};
     }
 </script>
 </body>

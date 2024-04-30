@@ -1,14 +1,14 @@
 function highlightEntities(entities) {
-            var text = document.getElementById('inputText').value;
-            entities.forEach(function (entity) {
-                var re = new RegExp(entity.entity, 'g');
-                var type = entity.type;
-                var confidence = entity.confidence;
-                var color = entity.color;
-                text = text.replace(re, '<span class="entity" style="background-color:' + color + ';" title="Type: ' + type + ', Confidence: ' + confidence.toFixed(2) + '">' + entity.entity + '</span>');
-            });
-            document.getElementById('outputText').innerHTML = text;
-        }
+    var text = document.getElementById('inputText').value;
+    entities.forEach(function (entity) {
+        var re = new RegExp(entity.entity, 'g');
+        var type = entity.type;
+        var confidence = entity.confidence;
+        var color = entity.color;
+        text = text.replace(re, '<span class="entity" style="background-color:' + color + ';" title="Type: ' + type + ', Confidence: ' + confidence.toFixed(2) + '">' + entity.entity + '</span>');
+    });
+    document.getElementById('outputText').innerHTML = text;
+}
 
 // 处理表单提交
 function submitForm() {

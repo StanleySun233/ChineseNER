@@ -49,15 +49,15 @@
         </thead>
         <tbody>
         {% for user in users %}
-            <tr>
-                <td>{{ user.account }}</td>
-                <td class="text-center">{{ user.password }}</td>
-                <td class="text-center">{{ user.create_time }}</td>
-                <td class="text-center">
-                    <a href="/delete_user/{{ user.id }}" class="btn btn-danger btn-sm">删除</a>
-                    <a href="/update_user/{{ user.id }}" class="btn btn-primary btn-sm ml-2">更新</a>
-                </td>
-            </tr>
+        <tr>
+            <td>{{ user.account }}</td>
+            <td class="text-center">{{ user.password }}</td>
+            <td class="text-center">{{ user.create_time }}</td>
+            <td class="text-center">
+                <a href="/delete_user/{{ user.id }}" class="btn btn-danger btn-sm">删除</a>
+                <a href="/update_user/{{ user.id }}" class="btn btn-primary btn-sm ml-2">更新</a>
+            </td>
+        </tr>
         {% endfor %}
         </tbody>
     </table>

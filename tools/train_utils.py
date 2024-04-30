@@ -115,9 +115,12 @@ def get_eval_metrics(label_ids, pred_ids, idx2tag, task_name=''):
     pred_ids = tf.cast(pred_ids, tf.int32)
     if task_name:
         metric_op = {
-            'metric_{}/overall_accuracy'.format(task_name): tf.metrics.accuracy(labels=label_ids, predictions=pred_ids, weights=mask),
-            'metric_{}/overall_precision'.format(task_name): tf.metrics.precision(labels=label_ids, predictions=pred_ids, weights=mask),
-            'metric_{}/overall_recall'.format(task_name): tf.metrics.recall(labels=label_ids, predictions=pred_ids, weights=mask),
+            'metric_{}/overall_accuracy'.format(task_name): tf.metrics.accuracy(labels=label_ids, predictions=pred_ids,
+                                                                                weights=mask),
+            'metric_{}/overall_precision'.format(task_name): tf.metrics.precision(labels=label_ids,
+                                                                                  predictions=pred_ids, weights=mask),
+            'metric_{}/overall_recall'.format(task_name): tf.metrics.recall(labels=label_ids, predictions=pred_ids,
+                                                                            weights=mask),
         }
     else:
         metric_op = {
