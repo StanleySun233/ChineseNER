@@ -9,7 +9,6 @@ from itertools import chain
 from tools.utils import get_log_hook
 from collections import namedtuple
 from typing import List
-import tensorflow.metrics
 
 
 class AddonParser(object):
@@ -113,26 +112,38 @@ def get_eval_metrics(label_ids, pred_ids, idx2tag, task_name=''):
     max_length = label_ids.shape[-1].value
     mask = tf.sequence_mask(real_length, maxlen=max_length)
     pred_ids = tf.cast(pred_ids, tf.int32)
+
     if task_name:
         metric_op = {
             'metric_{}/overall_accuracy'.format(task_name): tf.metrics.accuracy(labels=label_ids, predictions=pred_ids,
-                                                                                weights=mask),
-            'metric_{}/overall_precision'.format(task_name): tf.metrics.precision(labels=label_ids,
-                                                                                  predictions=pred_ids, weights=mask),
-            'metric_{}/overall_recall'.format(task_name): tf.metrics.recall(labels=label_ids, predictions=pred_ids,
-                                                                            weights=mask),
+                                                                                weights=mask)
         }
     else:
         metric_op = {
             'metric/overall_accuracy': tf.metrics.accuracy(labels=label_ids, predictions=pred_ids, weights=mask),
-            'metric/overall_precision': tf.metrics.precision(labels=label_ids, predictions=pred_ids, weights=mask),
-            'metric/overall_recall': tf.metrics.recall(labels=label_ids, predictions=pred_ids, weights=mask),
         }
+
     # add accuracy metric per NER tag
+    f1_scores = []
+    precision_scores = []
+    recall_scores = []
     for id, tag in idx2tag.items():
-        id = tf.cast(id, tf.int32)
-        metric_op.update(calc_metrics(tf.equal(label_ids, id), tf.equal(pred_ids, id), mask, tag, task_name))
-    print(metric_op)
+        if tag not in ['[PAD]', '[SEP]', '[CLS]']:  # Exclude specific tags
+            id = tf.cast(id, tf.int32)
+            metrics = calc_metrics(tf.equal(label_ids, id), tf.equal(pred_ids, id), mask, tag, task_name)
+            metric_op.update(metrics)
+            precision_scores.append(metrics['metric_{}/{}_precision'.format(task_name, tag)][0])
+            recall_scores.append(metrics['metric_{}/{}_recall'.format(task_name, tag)][0])
+            f1_scores.append(metrics['metric_{}/{}_f1'.format(task_name, tag)][0])
+
+    # Calculate overall F1 score
+    overall_precision = tf.reduce_mean(precision_scores)
+    overall_recall = tf.reduce_mean(recall_scores)
+    overall_f1 = tf.reduce_mean(f1_scores)
+    metric_op['metric/overall_f1'.format(task_name)] = (overall_f1, tf.identity(overall_f1))
+    metric_op['metric/overall_precision'.format(task_name)] = (overall_precision, tf.identity(overall_precision))
+    metric_op['metric/overall_recall'.format(task_name)] = (overall_recall, tf.identity(overall_recall))
+
     return metric_op
 
 
@@ -283,9 +294,12 @@ def create_optimizer(init_lr, num_train_steps, num_warmup_steps, global_step):
         warmup_learning_rate = init_lr * warmup_percent_done
 
         is_warmup = tf.cast(global_steps_int < warmup_steps_int, tf.float32)
-        learning_rate = (
-                (1.0 - is_warmup) * learning_rate + is_warmup * warmup_learning_rate)
-
+        # learning_rate = (
+        #         (1.0 - is_warmup) * learning_rate + is_warmup * warmup_learning_rate)
+        # 此处学习率在训练bert_bilstm_crf / bert_cnn_crf 等模型时都出现：
+        # 学习率呈线性增加，F1 R P 都下降趋于0，
+        # 在运行bert_bilstm_crf_softlexicon模型时，学习率可以先递增再下降，因此改为0.0001。
+        learning_rate = 0.0001
     optimizer = AdamWeightDecayOptimizer(
         learning_rate=learning_rate,
         weight_decay_rate=0.01,

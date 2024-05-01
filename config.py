@@ -9,7 +9,7 @@ TRAIN_PARAMS = {
     'pretrain_dir': './pretrain_model/ch_google',  # pretrain Bert-Model
     'batch_size': 8,
     'epoch_size': 5,
-    'embedding_dropout': 0.1,
+    'embedding_dropout': 0.5,
     'warmup_ratio': 0.1,
     'early_stop_ratio': 1  # stop after ratio * steps_per_epoch
 }

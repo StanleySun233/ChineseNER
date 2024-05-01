@@ -135,7 +135,7 @@ if __name__ == '__main__':
     parser.add_argument('--rename', type=str, help='Allow rename model with special parameter',
                         required=False, default='')
     parser.add_argument('--export_only', type=int, help='Export Model without training when ckpt exists',
-                        required=False, default=1)
+                        required=False, default=0)
     args = parser.parse_args()
 
     import os
