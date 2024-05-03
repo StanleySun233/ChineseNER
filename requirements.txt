@@ -7,9 +7,11 @@ bert-base==0.0.9
 gensim==3.8.3
 gast==0.3.3
 jieba
-numpy==1.16.0
+numpy==1.17.0
 # protobuf==3.20.0
 protobuf==3.19.6
 seqeval==1.2.2
 scikit-learn==1.0.2
 pandas==1.1.5
+matplotlib
+seaborn

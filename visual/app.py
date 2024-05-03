@@ -13,6 +13,7 @@ db = SQLAlchemy(app)
 # 加载server模型
 bert_bilstm_crf_softlexicon_maritime = inference_util.get_bert_bilstm_crf_softlexicon_maritime()
 bilstm_crf_softlcion_msra = inference_util.get_bilstm_crf_softlcion_msra()
+bert_bilstm_crf_msra = inference_util.get_bert_bilstm_crf_msra()
 
 
 class User(db.Model):
@@ -355,6 +356,8 @@ def predict_by_text():
         opt = bert_bilstm_crf_softlexicon_maritime.predict(text)
     elif model_dataset == 'bilstm_crf_softlexicon_msra':
         opt = bilstm_crf_softlcion_msra.predict(text)
+    elif model_dataset == 'bert_bilstm_crf_msra':
+        opt = bert_bilstm_crf_msra.predict(text)
     else:
         return jsonify({"entities": []})
 

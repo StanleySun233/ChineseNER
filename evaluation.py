@@ -42,6 +42,7 @@ class SingleEval(object):
     def tag_eval(self):
         y_true = list(chain(*[i['label_ids'] for i in self.prediction]))
         y_pred = list(chain(*[i['pred_ids'] for i in self.prediction]))
+        pd.DataFrame({'y_true': y_true, 'y_pred': y_pred}).to_csv("{}_{}_tag_predict.csv".format(self.data, self.model_name))
         target_names = [i for i in self.idx2tag.values() if i not in ['[PAD]', '[CLS]', '[SEP]']]
         report = tag_cls_report(y_true, y_pred, target_names=target_names, output_dict=True, digits=3)
         if self.verbose:
@@ -52,6 +53,7 @@ class SingleEval(object):
     def entity_eval(self):
         y_true = [i['labels'] for i in self.prediction]
         y_pred = [i['preds'] for i in self.prediction]
+        pd.DataFrame({'y_true': y_true, 'y_pred': y_pred}).to_csv("{}_{}_entity_predict.csv".format(self.data, self.model_name))
         report = ner_cls_report(y_true, y_pred, output_dict=True, digits=3)
         if self.verbose:
             print('Entity Level Evaluation Strict')

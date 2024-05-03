@@ -30,4 +30,21 @@ RUN_CONFIG = {
 PATH = 'D:/data/ChineseNER'
 
 model_api = {"bilstm_crf_softlexicon_msra": "8500",
-             "bert_bilstm_crf_softlexicon_maritime": "8400"}
+             "bert_bilstm_crf_softlexicon_maritime": "8400",
+             "bert_bilstm_crf_msra": "8300"}
+
+# 此处仅做绘制混淆矩阵使用，具体tag去data-dataset查看
+MARITIME = {
+    'B-CORP': 2,
+    'I-CORP': 3,
+    'B-CW': 4,
+    'I-CW': 5,
+    'B-GRP': 6,
+    'I-GRP': 7,
+    'B-LOC': 8,
+    'I-LOC': 9,
+    'B-PER': 10,
+    'I-PER': 11,
+    'B-PROD': 12,
+    'I-PROD': 13,
+}

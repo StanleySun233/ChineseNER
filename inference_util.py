@@ -116,6 +116,27 @@ def get_bilstm_crf_softlcion_msra():
     return InferenceUtil(MAX_SEQ_LEN, TAG2IDX, MODEL, VERSION, SERVER, TIMEOUT)
 
 
+def get_bert_bilstm_crf_msra():
+    MODEL = 'bert_bilstm_crf_msra'
+    SERVER = 'localhost:8300'
+    VERSION = 1
+    MAX_SEQ_LEN = 150
+    TIMEOUT = 10
+    TAG2IDX = {
+        '[PAD]': 0,
+        'O': 1,
+        'B-ORG': 2,
+        'I-ORG': 3,
+        'B-PER': 4,
+        'I-PER': 5,
+        'B-LOC': 6,
+        'I-LOC': 7,
+        '[CLS]': 8,
+        '[SEP]': 9
+    }
+    return InferenceUtil(MAX_SEQ_LEN, TAG2IDX, MODEL, VERSION, SERVER, TIMEOUT)
+
+
 def get_bert_bilstm_crf_softlexicon_maritime():
     MODEL = 'bert_bilstm_crf_softlexicon_maritime'
     SERVER = 'localhost:8400'
